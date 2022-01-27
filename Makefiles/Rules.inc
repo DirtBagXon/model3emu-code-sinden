@@ -69,7 +69,7 @@ endif
 #
 # Compiler options
 #
-ARCH =
+ARCH = -march=native
 OPT = -O3
 WARN = -Wall
 CSTD = -std=iso9899:2011

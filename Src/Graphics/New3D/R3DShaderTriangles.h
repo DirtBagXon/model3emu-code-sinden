@@ -168,10 +168,10 @@ vec4 texBiLinear(sampler2D texSampler, float level, ivec2 wrapMode, vec2 texSize
 	float a = LinearTexLocations(wrapMode.s, texSize.x, texCoord.x, tx[0], tx[1]);
 	float b = LinearTexLocations(wrapMode.t, texSize.y, texCoord.y, ty[0], ty[1]);
 	
-	vec4 p0q0 = texture2DLod(texSampler, vec2(tx[0],ty[0]), level);
-    vec4 p1q0 = texture2DLod(texSampler, vec2(tx[1],ty[0]), level);
-    vec4 p0q1 = texture2DLod(texSampler, vec2(tx[0],ty[1]), level);
-    vec4 p1q1 = texture2DLod(texSampler, vec2(tx[1],ty[1]), level);
+	vec4 p0q0 = texture2D(texSampler, vec2(tx[0],ty[0]), level);
+    vec4 p1q0 = texture2D(texSampler, vec2(tx[1],ty[0]), level);
+    vec4 p0q1 = texture2D(texSampler, vec2(tx[0],ty[1]), level);
+    vec4 p1q1 = texture2D(texSampler, vec2(tx[1],ty[1]), level);
 
 	if(alphaTest) {
 		if(p0q0.a > p1q0.a)		{ p1q0.rgb = p0q0.rgb; }

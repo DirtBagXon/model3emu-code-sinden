@@ -46,23 +46,23 @@ CInputs::CInputs(CInputSystem *system)
 	// the config file.
 	
 	// UI Controls  
-	uiExit             = AddSwitchInput("UIExit",             "Exit UI",               Game::INPUT_UI, "KEY_ESCAPE");
+	//uiExit             = AddSwitchInput("UIExit",             "Exit UI",               Game::INPUT_UI, "JOY1_BUTTON9+JOY1_BUTTON10");
 	uiReset            = AddSwitchInput("UIReset",            "Reset",                 Game::INPUT_UI, "KEY_ALT+KEY_R");
-	uiPause            = AddSwitchInput("UIPause",            "Pause",                 Game::INPUT_UI, "KEY_ALT+KEY_P");
+	//uiPause            = AddSwitchInput("UIPause",            "Pause",                 Game::INPUT_UI, "KEY_ALT+KEY_P");
 	uiFullScreen       = AddSwitchInput("UIFullScreen",       "Toggle Fullscreen",     Game::INPUT_UI, "KEY_ALT+KEY_RETURN");
-	uiSaveState        = AddSwitchInput("UISaveState",        "Save State",            Game::INPUT_UI, "KEY_F5");
-	uiChangeSlot       = AddSwitchInput("UIChangeSlot",       "Change Save Slot",      Game::INPUT_UI, "KEY_F6");
-	uiLoadState        = AddSwitchInput("UILoadState",        "Load State",            Game::INPUT_UI, "KEY_F7");
+	//uiSaveState        = AddSwitchInput("UISaveState",        "Save State",            Game::INPUT_UI, "KEY_F5");
+	//uiChangeSlot       = AddSwitchInput("UIChangeSlot",       "Change Save Slot",      Game::INPUT_UI, "KEY_F6");
+	//uiLoadState        = AddSwitchInput("UILoadState",        "Load State",            Game::INPUT_UI, "KEY_F7");
 	uiMusicVolUp	     = AddSwitchInput("UIMusicVolUp",		    "Increase Music Volume", Game::INPUT_UI, "KEY_F10");
 	uiMusicVolDown	   = AddSwitchInput("UIMusicVolDown",	    "Decrease Music Volume", Game::INPUT_UI, "KEY_F9");
 	uiSoundVolUp	     = AddSwitchInput("UISoundVolUp",		    "Increase Sound Volume", Game::INPUT_UI, "KEY_F12");
 	uiSoundVolDown	   = AddSwitchInput("UISoundVolDown",	    "Decrease Sound Volume", Game::INPUT_UI, "KEY_F11");
 	uiClearNVRAM       = AddSwitchInput("UIClearNVRAM",       "Clear NVRAM",           Game::INPUT_UI, "KEY_ALT+KEY_N");
-	uiSelectCrosshairs = AddSwitchInput("UISelectCrosshairs", "Select Crosshairs",     Game::INPUT_UI, "KEY_ALT+KEY_I");
+	//uiSelectCrosshairs = AddSwitchInput("UISelectCrosshairs", "Select Crosshairs",     Game::INPUT_UI, "KEY_ALT+KEY_I");
 	uiToggleFrLimit    = AddSwitchInput("UIToggleFrameLimit", "Toggle Frame Limiting", Game::INPUT_UI, "KEY_ALT+KEY_T");
 	uiDumpInpState     = AddSwitchInput("UIDumpInputState",   "Dump Input State",      Game::INPUT_UI, "KEY_ALT+KEY_U");
 	uiDumpTimings      = AddSwitchInput("UIDumpTimings",      "Dump Frame Timings",    Game::INPUT_UI, "KEY_ALT+KEY_O");
-	uiScreenshot       = AddSwitchInput("UIScreenShot",	      "Screenshot",            Game::INPUT_UI, "KEY_ALT+KEY_S");
+	//uiScreenshot       = AddSwitchInput("UIScreenShot",	      "Screenshot",            Game::INPUT_UI, "KEY_ALT+KEY_S");
 #ifdef SUPERMODEL_DEBUGGER
 	uiEnterDebugger    = AddSwitchInput("UIEnterDebugger",    "Enter Debugger",        Game::INPUT_UI, "KEY_ALT+KEY_B");
 #endif
@@ -76,7 +76,13 @@ CInputs::CInputs(CInputSystem *system)
 	service[1]         = AddSwitchInput("ServiceB", "Service B", Game::INPUT_COMMON, "NONE");
 	test[0]            = AddSwitchInput("TestA",    "Test A",    Game::INPUT_COMMON, "NONE");
 	test[1]            = AddSwitchInput("TestB",    "Test B",    Game::INPUT_COMMON, "NONE");
-	
+	uiExit             = AddSwitchInput("UIExit",   "Exit UI",   Game::INPUT_COMMON, "NONE");
+	uiPause            = AddSwitchInput("UIPause",  "Pause",     Game::INPUT_COMMON, "NONE");
+	uiScreenshot       = AddSwitchInput("UIScreenShot",	 "Screenshot",    Game::INPUT_COMMON, "NONE");
+	uiSaveState        = AddSwitchInput("UISaveState",   "Save State",    Game::INPUT_COMMON, "NONE");
+	uiLoadState        = AddSwitchInput("UILoadState",   "Load State",    Game::INPUT_COMMON, "NONE");
+	uiSelectCrosshairs = AddSwitchInput("UISelectCrosshairs", "Select Crosshairs",     Game::INPUT_COMMON, "NONE");
+	uiChangeSlot       = AddSwitchInput("UIChangeSlot",       "Change Save Slot",      Game::INPUT_COMMON, "NONE");
 	// 4-Way Joysticks
 	up[0]              = AddSwitchInput("JoyUp",     "P1 Joystick Up",    Game::INPUT_JOYSTICK1, "NONE");
 	down[0]            = AddSwitchInput("JoyDown",   "P1 Joystick Down",  Game::INPUT_JOYSTICK1, "NONE");
