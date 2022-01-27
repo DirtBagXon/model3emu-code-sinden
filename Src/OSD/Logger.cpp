@@ -212,7 +212,9 @@ void CConsoleErrorLogger::InfoLog(const char *fmt, va_list vl)
 void CConsoleErrorLogger::ErrorLog(const char *fmt, va_list vl)
 {
   char  string[4096];
-  vsprintf(string, fmt, vl);
+  va_list vlCopy;
+  va_copy(vlCopy, vl);
+  vsprintf(string, fmt, vlCopy);
   fprintf(stderr, "Error: %s\n", string);
 }
 
