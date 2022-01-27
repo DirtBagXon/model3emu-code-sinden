@@ -739,7 +739,7 @@ static void DrawBorder(bool boost)
     glVertex2f(1.0f, w);
     glVertex2f(0.0f, w);
   glEnd();
-  w = float(0.982f - f);
+  w = float(0.984f - f);
   glBegin(GL_TRIANGLES); //right
     glVertex2f(w, 1.0f);
     glVertex2f(w, 0.0f);
@@ -758,7 +758,7 @@ static void DrawBorder(bool boost)
     glVertex2f(1.0f, 1.0f);
     glVertex2f(0.0f, 1.0f);
   glEnd();
-  w = float(0.018f + f);
+  w = float(0.016f + f);
   glBegin(GL_TRIANGLES); //left
     glVertex2f(0.0f, 1.0f);
     glVertex2f(0.0f, 0.0f);
