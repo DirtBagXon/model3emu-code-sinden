@@ -1,0 +1,116 @@
+##
+## Supermodel
+## A Sega Model 3 Arcade Emulator.
+## Copyright 2011-2020 Bart Trzynadlowski, Nik Henson, Ian Curtis,
+##                     Harry Tuttle, and Spindizzi
+##
+## This file is part of Supermodel.
+##
+## Supermodel is free software: you can redistribute it and/or modify it under
+## the terms of the GNU General Public License as published by the Free
+## Software Foundation, either version 3 of the License, or (at your option)
+## any later version.
+##
+## Supermodel is distributed in the hope that it will be useful, but WITHOUT
+## ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+## FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+## more details.
+##
+## You should have received a copy of the GNU General Public License along
+## with Supermodel.  If not, see <http://www.gnu.org/licenses/>.
+##
+
+#
+# Makefile.Win32
+#
+# Makefile for Windows systems using gcc and the standard Command Prompt.
+#
+# Set variables in the "Configuration" section as required by your system
+# configuration.
+#
+
+
+###############################################################################
+# Configuration
+#
+# Edit as necessary. Some users may need to edit the "Platform Configuration"
+# section as well, namely SDL2_LIBS and PLATFORM_LIBS.
+###############################################################################
+
+#
+# Must be included first
+#
+include Makefiles/Options.inc
+
+#
+# Bitness of build ('32' or '64')
+#
+BITS = 64
+
+#
+# Path to SDL2
+#
+SDL2_INCLUDE_DIR = \msys64\mingw64\include\SDL2
+SDL2_LIB_DIR = \msys64\mingw64\lib
+
+#
+# Toolchain
+#
+CC = gcc
+CXX = g++
+LD = g++
+
+
+###############################################################################
+# Platform Configuration
+###############################################################################
+
+# Safety check: can be only '32' or '64' otherwise defaults to '64'
+ifneq ($(filter $(strip $(BITS)),32 64),$(strip $(BITS)))
+	override BITS = 64
+endif
+
+#
+# Use Bash or Windows Prompt shell commands?
+#
+DELETE = rm -d -r -f
+ifeq ($(strip $(MSYSTEM)),)
+	DELETE = rmdir /s /q
+endif
+
+#
+# SDL2
+#
+SDL2_LIBS =  -lmingw32 -lSDL2main -lSDL2 -Wl,--no-undefined -lshell32 -lsetupapi -ladvapi32 -luuid -lversion -limm32 -lwinmm -lgdi32 -luser32 -lm -pipe
+SDL2_CFLAGS =
+ifeq ($(strip $(NET_BOARD)),1)
+	SDL2_LIBS += -lSDL2_net -liphlpapi
+endif
+
+#
+# MinGW/Windows-specific
+#
+
+PLATFORM_INCLUDE_DIR = $(SDL2_INCLUDE_DIR)
+PLATFORM_LIB_DIR = $(SDL2_LIB_DIR)
+PLATFORM_LIBS = -ldxerr8 -ldinput8 -lglu32 -lole32 -loleaut32 -lopengl32 -lwbemuuid -lws2_32 -lz
+PLATFORM_CXXFLAGS = $(SDL2_CFLAGS) -DSUPERMODEL_WIN32 $(addprefix -I,$(sort $(PLATFORM_INCLUDE_DIR)))
+PLATFORM_LDFLAGS = -static -L$(sort $(PLATFORM_LIB_DIR)) $(SDL2_LIBS) $(PLATFORM_LIBS)
+
+
+###############################################################################
+# Core Makefile
+###############################################################################
+
+PLATFORM_SRC_FILES = \
+	Src/OSD/Windows/DirectInputSystem.cpp \
+	Src/OSD/Windows/WinOutputs.cpp
+
+.PHONY: clean
+
+include Makefiles/Rules.inc
+
+clean:
+	$(SILENT)echo Cleaning up $(BIN_DIR) and $(OBJ_DIR)...
+	$(SILENT)$(DELETE) $(BIN_DIR)
+	$(SILENT)$(DELETE) $(OBJ_DIR)
