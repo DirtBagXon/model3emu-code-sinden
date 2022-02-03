@@ -177,7 +177,7 @@ CSDLInputSystem::CSDLInputSystem(const Util::Config::Node& config)
     m_mouseButtons(0),
     m_config(config)
 {
-  //
+SDL_CaptureMouse = 1
 }
 
 CSDLInputSystem::~CSDLInputSystem()
