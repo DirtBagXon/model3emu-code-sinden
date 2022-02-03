@@ -727,9 +727,11 @@ static void DrawBorder(bool boost)
   glColor3f(1.0f,1.0f,1.0f); // White Border
   glPointSize(1.0f);
 
-  if (boost) f = 0.006f;
+  if (boost) {
+      f = 0.006f;
+      z = 0.0015f;
+  }
 
-  if (boost) z = 0.0015f;
   w = float(0.022f + (f + z));
   glBegin(GL_TRIANGLES); // top
     glVertex2f(0.0f, w);
@@ -748,7 +750,6 @@ static void DrawBorder(bool boost)
     glVertex2f(1.0f, 1.0f);
     glVertex2f(w, 1.0f);
   glEnd();
-  if (boost) z = 0.0015f;
   w = float(0.978f - (f + z));
   glBegin(GL_TRIANGLES); //bottom
     glVertex2f(0.0f, 1.0f);
@@ -875,8 +876,7 @@ bool BeginFrameVideo()
 void EndFrameVideo()
 {
   // Show crosshairs for light gun games
-  if (videoInputs)
-    UpdateCrosshairs(currentInputs, videoInputs, s_runtime_config["Crosshairs"].ValueAs<unsigned>(),
+  UpdateCrosshairs(currentInputs, videoInputs, s_runtime_config["Crosshairs"].ValueAs<unsigned>(),
 		    s_runtime_config["Borders"].ValueAs<unsigned>());
 
   // Swap the buffers
@@ -951,11 +951,7 @@ int Supermodel(const Game &game, ROMSet *rom_set, IEmulator *Model3, CInputs *In
   gameHasLightguns = !!(game.inputs & (Game::INPUT_GUN1|Game::INPUT_GUN2));
   gameHasLightguns |= game.name == "lostwsga";
   currentInputs = game.inputs;
-  if (gameHasLightguns)
-    videoInputs = Inputs;
-  else
-    videoInputs = Inputs; // Force all games to use lightgun Input
-                          // This seems required in Legacy3D driver
+  videoInputs = Inputs;   // Force all games to use UpdateCrosshairs()
                           // There is immediate return, without crosshair
                           // or border arguments, in the draw function...
 
@@ -1479,6 +1475,7 @@ static Util::Config::Node DefaultConfig()
   config.Set("Borders", int(0));
   config.Set("Crosshairs", int(0));
   config.Set("MouseCursor", true);
+  config.Set("GrabCursor", false);
   config.Set("FlipStereo", false);
 #ifdef SUPERMODEL_WIN32
   config.Set("InputSystem", "dinput");
@@ -1562,6 +1559,7 @@ static void Help(void)
   puts("  -crosshairs=<n>         Crosshairs configuration for gun games:");
   puts("                          0=none [Default], 1=P1 only, 2=P2 only, 3=P1 & P2");
   puts("  -nomousecursor          Disable desktop mouse cursor in SDL Windowed mode");
+  puts("  -grabcursor             Limit cursor movement to SDL Window");
   puts("  -new3d                  New 3D engine by Ian Curtis [Default]");
   puts("  -quad-rendering         Enable proper quad rendering");
   puts("  -legacy3d               Legacy 3D engine (faster but less accurate)");
@@ -1695,6 +1693,7 @@ static ParsedCommandLine ParseCommandLine(int argc, char **argv)
     { "-legacy-scsp",         { "LegacySoundDSP",   true } },
     { "-new-scsp",            { "LegacySoundDSP",   false } },
     { "-nomousecursor",       { "MouseCursor",      false } },
+    { "-grabcursor",          { "GrabCursor",       true } },
 #ifdef NET_BOARD
     { "-net",                 { "Network",       true } },
     { "-no-net",              { "Network",       false } },
@@ -1940,8 +1939,11 @@ int main(int argc, char **argv)
 #endif
 
   // Create input system
-  if (selectedInputSystem == "sdl")
+  if (selectedInputSystem == "sdl") {
     InputSystem = new CSDLInputSystem(s_runtime_config);
+    if (s_runtime_config["GrabCursor"].ValueAs<bool>())
+        SDL_SetWindowGrab(s_window, SDL_TRUE);
+  }
 #ifdef SUPERMODEL_WIN32
   else if (selectedInputSystem == "dinput")
     InputSystem = new CDirectInputSystem(s_runtime_config, s_window, false, false);
