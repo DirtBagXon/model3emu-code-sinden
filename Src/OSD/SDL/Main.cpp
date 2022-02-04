@@ -733,40 +733,34 @@ static void DrawBorder(bool boost)
   }
 
   w = float(0.022f + (f + z));
-  glBegin(GL_TRIANGLES); // top
-    glVertex2f(0.0f, w);
-    glVertex2f(0.0f, 0.0f);
-    glVertex2f(1.0f, 0.0f);
-    glVertex2f(1.0f, 0.0f);
-    glVertex2f(1.0f, w);
-    glVertex2f(0.0f, w);
-  glEnd();
+  glBegin(GL_TRIANGLES);
+  glVertex2f(0.0f, w);
+  glVertex2f(0.0f, 0.0f);
+  glVertex2f(1.0f, 0.0f);
+  glVertex2f(1.0f, 0.0f);
+  glVertex2f(1.0f, w);
+  glVertex2f(0.0f, w);
   w = float(0.984f - f);
-  glBegin(GL_TRIANGLES); //right
-    glVertex2f(w, 1.0f);
-    glVertex2f(w, 0.0f);
-    glVertex2f(1.0f, 0.0f);
-    glVertex2f(1.0f, 0.0f);
-    glVertex2f(1.0f, 1.0f);
-    glVertex2f(w, 1.0f);
-  glEnd();
+  glVertex2f(w, 1.0f);
+  glVertex2f(w, 0.0f);
+  glVertex2f(1.0f, 0.0f);
+  glVertex2f(1.0f, 0.0f);
+  glVertex2f(1.0f, 1.0f);
+  glVertex2f(w, 1.0f);
   w = float(0.978f - (f + z));
-  glBegin(GL_TRIANGLES); //bottom
-    glVertex2f(0.0f, 1.0f);
-    glVertex2f(0.0f, w);
-    glVertex2f(1.0f, w);
-    glVertex2f(1.0f, w);
-    glVertex2f(1.0f, 1.0f);
-    glVertex2f(0.0f, 1.0f);
-  glEnd();
+  glVertex2f(0.0f, 1.0f);
+  glVertex2f(0.0f, w);
+  glVertex2f(1.0f, w);
+  glVertex2f(1.0f, w);
+  glVertex2f(1.0f, 1.0f);
+  glVertex2f(0.0f, 1.0f);
   w = float(0.016f + f);
-  glBegin(GL_TRIANGLES); //left
-    glVertex2f(0.0f, 1.0f);
-    glVertex2f(0.0f, 0.0f);
-    glVertex2f(w, 0.0f);
-    glVertex2f(w, 0.0f);
-    glVertex2f(w, 1.0f);
-    glVertex2f(0.0f, 1.0f);
+  glVertex2f(0.0f, 1.0f);
+  glVertex2f(0.0f, 0.0f);
+  glVertex2f(w, 0.0f);
+  glVertex2f(w, 0.0f);
+  glVertex2f(w, 1.0f);
+  glVertex2f(0.0f, 1.0f);
   glEnd();
 }
 
