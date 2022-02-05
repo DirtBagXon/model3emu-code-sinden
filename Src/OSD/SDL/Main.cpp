@@ -732,29 +732,29 @@ static void DrawBorder(bool boost)
       z = 0.0015f;
   }
 
-  w = float(0.022f + (f + z));
   glBegin(GL_TRIANGLES);
+  w = float(0.022f + (f + z)); //top
   glVertex2f(0.0f, w);
   glVertex2f(0.0f, 0.0f);
   glVertex2f(1.0f, 0.0f);
   glVertex2f(1.0f, 0.0f);
   glVertex2f(1.0f, w);
   glVertex2f(0.0f, w);
-  w = float(0.984f - f);
+  w = float(0.984f - f); //right
   glVertex2f(w, 1.0f);
   glVertex2f(w, 0.0f);
   glVertex2f(1.0f, 0.0f);
   glVertex2f(1.0f, 0.0f);
   glVertex2f(1.0f, 1.0f);
   glVertex2f(w, 1.0f);
-  w = float(0.978f - (f + z));
+  w = float(0.978f - (f + z)); //bottom
   glVertex2f(0.0f, 1.0f);
   glVertex2f(0.0f, w);
   glVertex2f(1.0f, w);
   glVertex2f(1.0f, w);
   glVertex2f(1.0f, 1.0f);
   glVertex2f(0.0f, 1.0f);
-  w = float(0.016f + f);
+  w = float(0.016f + f); //left
   glVertex2f(0.0f, 1.0f);
   glVertex2f(0.0f, 0.0f);
   glVertex2f(w, 0.0f);
