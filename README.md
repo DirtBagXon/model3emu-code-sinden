@@ -4,7 +4,14 @@ This is a fork of [model3emu-code](https://www.supermodel3.com) to add native **
 
 It will attempt to track SVN commits.
 
-Additional arguments:
+### RetroPie package
+Use `supermodel3.sh` for _RetroPie-Setup_
+
+    wget https://raw.githubusercontent.com/DirtBagXon/model3emu-code-sinden/main/supermodel3.sh -O $HOME/RetroPie-Setup/scriptmodules/emulators/supermodel3.sh
+
+    sudo $HOME/RetroPie-Setup/retropie_setup.sh
+
+### Additional arguments:
 
     -borders=<n>      Sinden border configuration for gun games:
                       0=none [Default], 1=standard, 2=wide
