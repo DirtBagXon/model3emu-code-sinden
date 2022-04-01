@@ -49,17 +49,6 @@ function configure_supermodel3() {
 
     local allemu="/opt/retropie/configs/all/emulators.cfg"
 
-    # Cleanup old script style install (if present)
-    # This section should be removed a.s.a.p ......
-    local arcemu="/opt/retropie/configs/arcade/emulators.cfg"
-
-    if grep -q "Supermodel" "$allemu"; then
-            sed -i "/.*Supermodel.*/d" $allemu
-            sed -i "/.*Supermodel.*/d" $arcemu
-            rm -rf "/opt/retropie/emulators/supermodel"
-    fi
-    # end section
-
     addEmulator 0 "$md_id" "arcade" "XINIT:$md_inst/$md_id -borders=2 %ROM%"
     addSystem "arcade"
 
