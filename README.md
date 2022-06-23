@@ -3,7 +3,7 @@
 
 This is a fork of [model3emu-code](https://www.supermodel3.com) to add native **Sinden** light gun support.
 
-It will attempt to track repo commits.
+It will attempt to track Git repo commits.
 
 Additional arguments:
 
