@@ -29,7 +29,7 @@
 #define INCLUDED_VERSION_H
 
 #ifndef SUPERMODEL_VERSION
-#define SUPERMODEL_VERSION	"0.3a-a60f998 DirtBagXon (Sinden)"
+#define SUPERMODEL_VERSION	"0.3a-0eef09b DirtBagXon (Sinden)"
 #endif
 
 #endif	// INCLUDED_VERSION_H
