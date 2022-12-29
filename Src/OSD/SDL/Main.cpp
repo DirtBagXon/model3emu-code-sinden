@@ -907,16 +907,11 @@ static void DrawCrosshair(const float* matrix, float x, float y, float r, float 
   basicDraw.Draw(GL_TRIANGLES, matrix, verts.data(), (int)verts.size(), r, g, b, 1.0f);
 }
 
-static void DrawBorder(bool boost)
+static void DrawBorder(const float* matrix, bool boost)
 {
-
-  New3D::Mat4 m;
-  m.Ortho(0.0, 1.0, 1.0, 0.0, -1.0f, 1.0f);
-
   std::vector<BasicDraw::BasicVertex> verts;
 
   float f = 0.0f, w = 0.0f, z = 0.0f;
-  float r = 1.0f, g = 1.0f, b = 1.0f;
 
   if (boost) {
       f = 0.006f;
@@ -952,7 +947,7 @@ static void DrawBorder(bool boost)
   verts.emplace_back(w, 1.0f);
   verts.emplace_back(0.0f, 1.0f);
 
-  basicDraw.Draw(GL_TRIANGLES, m, verts.data(), (int)verts.size(), r, g, b, 1.0f);
+  basicDraw.Draw(GL_TRIANGLES, matrix, verts.data(), (int)verts.size(), 1.0f, 1.0f, 1.0f, 1.0f);
 }
 
 /*
@@ -1032,9 +1027,9 @@ static void UpdateCrosshairs(uint32_t currentInputs, CInputs *Inputs, unsigned c
 
   // Border width
   if (borders & 2)
-       DrawBorder(true);
+       DrawBorder(m, true);
   else if (borders & 1)
-       DrawBorder(false);
+       DrawBorder(m, false);
 
   //PrintGLError(glGetError());
 }
