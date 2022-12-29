@@ -1,7 +1,7 @@
 /**
  ** Supermodel
  ** A Sega Model 3 Arcade Emulator.
- ** Copyright 2011-2012 Bart Trzynadlowski, Nik Henson
+ ** Copyright 2003-2022 The Supermodel Team
  **
  ** This file is part of Supermodel.
  **
@@ -19,17 +19,28 @@
  ** with Supermodel.  If not, see <http://www.gnu.org/licenses/>.
  **/
 
-/*
- * Version.h
- *
- * Supermodel version string.
- */
+#include "FileSystemPath.h"
+#include <string>
 
-#ifndef INCLUDED_VERSION_H
-#define INCLUDED_VERSION_H
-
-#ifndef SUPERMODEL_VERSION
-#define SUPERMODEL_VERSION	"0.3a-78f5056 DirtBagXon (Sinden)"
-#endif
-
-#endif	// INCLUDED_VERSION_H
+namespace FileSystemPath
+{
+    // Generates a path to be used by Supermodel files
+    std::string GetPath(PathType pathType)
+    {
+        switch (pathType)
+        {
+        case Analysis:
+            return "Analysis/";
+        case Config:
+            return "Config/";
+        case Log:
+            return "";
+        case NVRAM:
+            return "NVRAM/";
+        case Saves:
+            return "Saves/";
+        case Screenshots:
+            return "";
+        }
+    }
+}

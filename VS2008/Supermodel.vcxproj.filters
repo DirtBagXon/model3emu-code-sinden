@@ -257,6 +257,9 @@
     <ClCompile Include="..\Src\OSD\Windows\WinOutputs.cpp">
       <Filter>Source Files\OSD\Windows</Filter>
     </ClCompile>
+    <ClCompile Include="..\Src\OSD\Windows\FileSystemPath.cpp">
+      <Filter>Source Files\OSD\Windows</Filter>
+    </ClCompile>
     <ClCompile Include="..\Src\Pkgs\glew.c">
       <Filter>Source Files\Pkgs</Filter>
     </ClCompile>
@@ -375,12 +378,6 @@
       <Filter>Source Files\Graphics\New</Filter>
     </ClCompile>
     <ClCompile Include="..\Src\Graphics\New3D\R3DShader.cpp">
-      <Filter>Source Files\Graphics\New</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Src\Graphics\New3D\Texture.cpp">
-      <Filter>Source Files\Graphics\New</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Src\Graphics\New3D\TextureSheet.cpp">
       <Filter>Source Files\Graphics\New</Filter>
     </ClCompile>
     <ClCompile Include="..\Src\Graphics\New3D\VBO.cpp">
@@ -833,12 +830,6 @@
       <Filter>Header Files\Graphics\New</Filter>
     </ClInclude>
     <ClInclude Include="..\Src\Graphics\New3D\R3DShaderTriangles.h">
-      <Filter>Header Files\Graphics\New</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\Graphics\New3D\Texture.h">
-      <Filter>Header Files\Graphics\New</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\Graphics\New3D\TextureSheet.h">
       <Filter>Header Files\Graphics\New</Filter>
     </ClInclude>
     <ClInclude Include="..\Src\Graphics\New3D\VBO.h">
