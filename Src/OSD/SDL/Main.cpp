@@ -1517,7 +1517,6 @@ static Util::Config::Node DefaultConfig()
   config.Set("Borders", int(0));
   config.Set("Crosshairs", int(0));
   config.Set("MouseCursor", true);
-  config.Set("GrabCursor", false);
   config.Set("FlipStereo", false);
 #ifdef SUPERMODEL_WIN32
   config.Set("InputSystem", "dinput");
@@ -1604,7 +1603,6 @@ static void Help(void)
   puts("  -crosshairs=<n>         Crosshairs configuration for gun games:");
   puts("                          0=none [Default], 1=P1 only, 2=P2 only, 3=P1 & P2");
   puts("  -nomousecursor          Disable desktop mouse cursor in SDL Windowed mode");
-  puts("  -grabcursor             Limit cursor movement to SDL Window");
   puts("  -new3d                  New 3D engine by Ian Curtis [Default]");
   puts("  -quad-rendering         Enable proper quad rendering");
   puts("  -legacy3d               Legacy 3D engine (faster but less accurate)");
@@ -1741,7 +1739,6 @@ static ParsedCommandLine ParseCommandLine(int argc, char **argv)
     { "-legacy-scsp",         { "LegacySoundDSP",   true } },
     { "-new-scsp",            { "LegacySoundDSP",   false } },
     { "-nomousecursor",       { "MouseCursor",      false } },
-    { "-grabcursor",          { "GrabCursor",       true } },
 #ifdef NET_BOARD
     { "-net",                 { "Network",       true } },
     { "-no-net",              { "Network",       false } },
@@ -1990,8 +1987,6 @@ int main(int argc, char **argv)
   // Create input system
   if (selectedInputSystem == "sdl") {
     InputSystem = new CSDLInputSystem(s_runtime_config);
-    if (s_runtime_config["GrabCursor"].ValueAs<bool>())
-        SDL_SetWindowGrab(s_window, SDL_TRUE);
   }
 #ifdef SUPERMODEL_WIN32
   else if (selectedInputSystem == "dinput")
