@@ -3,6 +3,8 @@
 
 This is a fork of [model3emu-code](https://www.supermodel3.com) to add native **Sinden** light gun support.
 
+This fork uses [ManyMouse](https://github.com/icculus/manymouse) to provide 2 player gun support in Linux and SDL.
+
 It will attempt to track the main git repo commits.
 
 Additional arguments:

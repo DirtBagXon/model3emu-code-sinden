@@ -66,12 +66,12 @@ private:
 	// Current key state obtained from SDL
 	const Uint8 *m_keyState;
 
-	// Current mouse state obtained from SDL
-	int m_mouseX;
-	int m_mouseY;
-	int m_mouseZ;
-	short m_mouseWheelDir;
-	Uint8 m_mouseButtons;
+	// Current mouse state obtained from ManyMouse
+	int m_mouseX[MAX_MICE];
+	int m_mouseY[MAX_MICE];
+	int m_mouseZ[MAX_MICE];
+	short m_mouseWheelDir[MAX_MICE];
+	Uint8 m_mouseButtons[MAX_MICE];
 
 	// SDL2 ffb
 	SDL_HapticEffect eff;

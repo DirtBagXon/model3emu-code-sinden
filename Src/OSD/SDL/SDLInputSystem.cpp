@@ -176,13 +176,15 @@ SDLKeyMapStruct CSDLInputSystem::s_keyMap[] =
 CSDLInputSystem::CSDLInputSystem(const Util::Config::Node& config)
   : CInputSystem("SDL"),
     m_keyState(nullptr),
-    m_mouseX(0),
-    m_mouseY(0),
-    m_mouseZ(0),
-    m_mouseButtons(0),
     m_config(config)
 {
-  //
+  for (int i = 0; i < MAX_MICE; i++) {
+      m_mouseX[i] = 0;
+      m_mouseY[i] = 0;
+      m_mouseZ[i] = 0;
+      m_mouseButtons[i] = 0;
+      m_mouseWheelDir[i] = 0;
+  }
 }
 
 CSDLInputSystem::~CSDLInputSystem()
@@ -397,6 +399,17 @@ void CSDLInputSystem::CloseJoysticks()
   m_joysticks.clear();
   m_joyDetails.clear();
   m_SDLHapticDatas.clear();
+
+  for (int i = 0; i < MAX_MICE; i++) {
+      m_mouseX[i] = 0;
+      m_mouseY[i] = 0;
+      m_mouseZ[i] = 0;
+      m_mouseButtons[i] = 0;
+      m_mouseWheelDir[i] = 0;
+  }
+
+  m_mseDetails.clear();
+  m_manyMouseData.clear();
   ManyMouse_Quit();
 }
 
@@ -474,9 +487,9 @@ int CSDLInputSystem::GetMouseAxisValue(int mseNum, int axisNum)
   // Return value for given mouse axis
   switch (axisNum)
   {
-    case AXIS_X: return m_mouseX;
-    case AXIS_Y: return m_mouseY;
-    case AXIS_Z: return m_mouseZ;
+    case AXIS_X: return m_mouseX[mseNum];
+    case AXIS_Y: return m_mouseY[mseNum];
+    case AXIS_Z: return m_mouseZ[mseNum];
     default:     return 0;
   }
 }
@@ -484,20 +497,19 @@ int CSDLInputSystem::GetMouseAxisValue(int mseNum, int axisNum)
 int CSDLInputSystem::GetMouseWheelDir(int mseNum)
 {
   // Return wheel value
-  return m_mouseWheelDir;
+  return m_mouseWheelDir[mseNum];
 }
 
 bool CSDLInputSystem::IsMouseButPressed(int mseNum, int butNum)
 {
-
   // Return value for given mouse button
   switch (butNum)
   {
-    case 0:  return !!(m_mouseButtons & SDL_BUTTON_LMASK);
-    case 1:  return !!(m_mouseButtons & SDL_BUTTON_RMASK);
-    case 2:  return !!(m_mouseButtons & SDL_BUTTON_MMASK);
-    case 3:  return !!(m_mouseButtons & SDL_BUTTON_X1MASK);
-    case 4:  return !!(m_mouseButtons & SDL_BUTTON_X2MASK);
+    case 0:  return !!(m_mouseButtons[mseNum] & SDL_BUTTON_LMASK);
+    case 1:  return !!(m_mouseButtons[mseNum] & SDL_BUTTON_RMASK);
+    case 2:  return !!(m_mouseButtons[mseNum] & SDL_BUTTON_MMASK);
+    case 3:  return !!(m_mouseButtons[mseNum] & SDL_BUTTON_X1MASK);
+    case 4:  return !!(m_mouseButtons[mseNum] & SDL_BUTTON_X2MASK);
     default: return false;
   }
 }
@@ -603,8 +615,7 @@ const KeyDetails *CSDLInputSystem::GetKeyDetails(int kbdNum)
 
 const MouseDetails *CSDLInputSystem::GetMouseDetails(int mseNum)
 {
-  // Return nullptr as SDL 1.2 cannot handle multiple mice
-  return nullptr;
+  return &m_mseDetails[mseNum];
 }
 
 const JoyDetails *CSDLInputSystem::GetJoyDetails(int joyNum)
@@ -615,7 +626,9 @@ const JoyDetails *CSDLInputSystem::GetJoyDetails(int joyNum)
 bool CSDLInputSystem::Poll()
 {
   // Reset mouse wheel direction
-  m_mouseWheelDir = 0;
+  for (int i = 0; i < MAX_MICE; i++) {
+     m_mouseWheelDir[i] = 0;
+  }
 
   // Poll for event from SDL
   SDL_Event e;
@@ -653,7 +666,7 @@ bool CSDLInputSystem::Poll()
 		else {
 			mouse->buttons &= ~(1 << mm_event.item);
 		}
-		m_mouseButtons = (Uint32)mouse->buttons;
+		m_mouseButtons[mm_event.device] = (Uint32)mouse->buttons;
 		break;
 	  case MANYMOUSE_EVENT_RELMOTION:
 
@@ -661,17 +674,17 @@ bool CSDLInputSystem::Poll()
 
 			mouse->x += mm_event.value;
 			if (mouse->x < 0) mouse->x = 0;
-			else if (mouse->x >= get_total_width()) mouse->x = get_total_width();
+			else if (mouse->x >= (int)get_total_width()) mouse->x = get_total_width();
 
-			m_mouseX = mouse->x;
+			m_mouseX[mm_event.device] = mouse->x;
 		}
 		else if (mm_event.item == 1) {
 
 			mouse->y += mm_event.value;
 			if (mouse->y < 0) mouse->y = 0;
-			else if (mouse->y >= get_total_height()) mouse->y = get_total_height();
+			else if (mouse->y >= (int)get_total_height()) mouse->y = get_total_height();
 
-			m_mouseY = mouse->y;
+			m_mouseY[mm_event.device] = mouse->y;
 		}
 		break;
 	  case MANYMOUSE_EVENT_ABSMOTION:
@@ -680,22 +693,28 @@ bool CSDLInputSystem::Poll()
 
 		if (mm_event.item == 0) {
 			mouse->x = (val / maxval) * get_total_width();
-			m_mouseX = mouse->x;
+			m_mouseX[mm_event.device] = mouse->x;
 		}
 		else if (mm_event.item == 1) {
 			mouse->y = (val / maxval) * get_total_height();
-			m_mouseY = mouse->y;
+			m_mouseY[mm_event.device] = mouse->y;
 		}
 		break;
 	case MANYMOUSE_EVENT_SCROLL:
 		if (mm_event.item == 0)
 		{
 			if (mm_event.value > 0) {
-				m_mouseZ += 5;
-				m_mouseWheelDir = 1;
+				if (m_mouseZ[mm_event.device] > abs(0x5f))
+				    m_mouseZ[mm_event.device] = abs(0x5f);
+
+				m_mouseZ[mm_event.device] += 5;
+				m_mouseWheelDir[mm_event.device] = 1;
 			} else {
-				m_mouseZ -= 5;
-				m_mouseWheelDir = -1;
+				if (m_mouseZ[mm_event.device] < -abs(0x5f))
+				    m_mouseZ[mm_event.device] = -abs(0x5f);
+
+				m_mouseZ[mm_event.device] -= 5;
+				m_mouseWheelDir[mm_event.device] = -1;
 			}
 		}
 		break;
