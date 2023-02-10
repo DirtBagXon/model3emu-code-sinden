@@ -33,9 +33,14 @@
 
 #include "Supermodel.h"
 #include "Inputs/Input.h"
+#include "Inputs/Manymouse.h"
 
+#include <iostream>
 #include <vector>
 using namespace std;
+
+static int available_mice = 0;
+static ManyMouseEvent mm_event;
 
 SDLKeyMapStruct CSDLInputSystem::s_keyMap[] =
 {
@@ -392,6 +397,7 @@ void CSDLInputSystem::CloseJoysticks()
   m_joysticks.clear();
   m_joyDetails.clear();
   m_SDLHapticDatas.clear();
+  ManyMouse_Quit();
 }
 
 bool CSDLInputSystem::InitializeSystem()
@@ -407,6 +413,35 @@ bool CSDLInputSystem::InitializeSystem()
 
   // Open attached joysticks
   OpenJoysticks();
+
+  // Initiate ManyMouse
+  available_mice = ManyMouse_Init();
+  static Mouse mice[MAX_MICE];
+  static MouseDetails detail[MAX_MICE];
+
+  std::cout << std::endl;
+
+  for (int i = 0; i < available_mice; i++)
+  {
+     const char *name = ManyMouse_DeviceName(i);
+     strncpy(mice[i].name, name, sizeof (mice[i].name));
+     mice[i].name[sizeof (mice[i].name) - 1] = '\0';
+     strncpy(detail[i].name, name, sizeof (detail[i].name));
+     detail[i].name[sizeof (detail[i].name) - 1] = '\0';
+
+     mice[i].connected = 1;
+
+     m_manyMouseData.push_back(mice[i]);
+     m_mseDetails.push_back(detail[i]);
+
+     std::cout << "#" << i << ": " << mice[i].name << std::endl;
+  }
+
+  std::cout << "Found " << available_mice << " available mice"  << std::endl;
+  std::cout << std::endl;
+
+  SDL_SetWindowGrab(get_window(), SDL_TRUE);
+
   return true;
 }
 
@@ -454,12 +489,13 @@ int CSDLInputSystem::GetMouseWheelDir(int mseNum)
 
 bool CSDLInputSystem::IsMouseButPressed(int mseNum, int butNum)
 {
+
   // Return value for given mouse button
   switch (butNum)
   {
     case 0:  return !!(m_mouseButtons & SDL_BUTTON_LMASK);
-    case 1:  return !!(m_mouseButtons & SDL_BUTTON_MMASK);
-    case 2:  return !!(m_mouseButtons & SDL_BUTTON_RMASK);
+    case 1:  return !!(m_mouseButtons & SDL_BUTTON_RMASK);
+    case 2:  return !!(m_mouseButtons & SDL_BUTTON_MMASK);
     case 3:  return !!(m_mouseButtons & SDL_BUTTON_X1MASK);
     case 4:  return !!(m_mouseButtons & SDL_BUTTON_X2MASK);
     default: return false;
@@ -550,8 +586,7 @@ int CSDLInputSystem::GetNumKeyboards()
 
 int CSDLInputSystem::GetNumMice()
 {
-  // Return ANY_MOUSE as SDL 1.2 cannot handle multiple mice
-  return ANY_MOUSE;
+  return available_mice;
 }
 
 int CSDLInputSystem::GetNumJoysticks()
@@ -592,29 +627,84 @@ bool CSDLInputSystem::Poll()
 	    break;
 		case SDL_QUIT:
 			return false;
-		case SDL_MOUSEWHEEL:
-			if (e.button.y > 0)
-			{
-				m_mouseZ += 5;
-				m_mouseWheelDir = 1;
-			}
-			else if (e.button.y < 0)
-			{
-				m_mouseZ -= 5;
-				m_mouseWheelDir = -1;
-			}
-			break;
 		}
   }
 
   // Get key state from SDL
   m_keyState = SDL_GetKeyboardState(nullptr);
 
-  // Get mouse state from SDL (except mouse wheel which was handled earlier)
-  m_mouseButtons = SDL_GetMouseState(&m_mouseX, &m_mouseY);
+  // Get mouse states from ManyMouse...
+  while (ManyMouse_PollEvent(&mm_event)) {
 
-  // Update joystick state (not required as called implicitly by SDL_PollEvent above)
-  //SDL_JoystickUpdate();
+      if (mm_event.device >= (unsigned int) available_mice)
+          continue;
+
+      Mouse *mouse;
+      static Mouse mice[MAX_MICE];
+      mouse = &mice[mm_event.device];
+      float val, maxval;
+
+      switch(mm_event.type) {
+
+	  case MANYMOUSE_EVENT_BUTTON:
+		if (mm_event.value == 1) {
+			mouse->buttons |= (1 << mm_event.item);
+		}
+		else {
+			mouse->buttons &= ~(1 << mm_event.item);
+		}
+		m_mouseButtons = (Uint32)mouse->buttons;
+		break;
+	  case MANYMOUSE_EVENT_RELMOTION:
+
+		if (mm_event.item == 0) {
+
+			mouse->x += mm_event.value;
+			if (mouse->x < 0) mouse->x = 0;
+			else if (mouse->x >= get_total_width()) mouse->x = get_total_width();
+
+			m_mouseX = mouse->x;
+		}
+		else if (mm_event.item == 1) {
+
+			mouse->y += mm_event.value;
+			if (mouse->y < 0) mouse->y = 0;
+			else if (mouse->y >= get_total_height()) mouse->y = get_total_height();
+
+			m_mouseY = mouse->y;
+		}
+		break;
+	  case MANYMOUSE_EVENT_ABSMOTION:
+		val = (float) (mm_event.value - mm_event.minval);
+		maxval = (float) (mm_event.maxval - mm_event.minval);
+
+		if (mm_event.item == 0) {
+			mouse->x = (val / maxval) * get_total_width();
+			m_mouseX = mouse->x;
+		}
+		else if (mm_event.item == 1) {
+			mouse->y = (val / maxval) * get_total_height();
+			m_mouseY = mouse->y;
+		}
+		break;
+	case MANYMOUSE_EVENT_SCROLL:
+		if (mm_event.item == 0)
+		{
+			if (mm_event.value > 0) {
+				m_mouseZ += 5;
+				m_mouseWheelDir = 1;
+			} else {
+				m_mouseZ -= 5;
+				m_mouseWheelDir = -1;
+			}
+		}
+		break;
+	  default:
+		break;
+
+      }
+  }
+
   return true;
 }
 

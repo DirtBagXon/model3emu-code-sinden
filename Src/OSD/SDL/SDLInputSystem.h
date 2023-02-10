@@ -43,6 +43,9 @@ struct SDLKeyMapStruct
 	SDL_Scancode sdlKey;
 };
 
+
+#define MAX_MICE 32
+
 /*
  * Input system that uses SDL.
  */
@@ -85,6 +88,24 @@ private:
 		int effectFrictionForceID = -1;
 	};
 	std::vector<hapticInfo> m_SDLHapticDatas;
+
+	struct Mouse
+	{
+		int connected;
+		int x;
+		int y;
+		int relx;
+		int rely;
+		SDL_Color color;
+		char name[MAX_NAME_LENGTH + 1];
+		Uint32 buttons;
+		Uint32 scrolluptick;
+		Uint32 scrolldowntick;
+		Uint32 scrolllefttick;
+		Uint32 scrollrighttick;
+	};
+	std::vector<Mouse> m_manyMouseData;
+	std::vector<MouseDetails> m_mseDetails;
 
 	/*
 	 * Opens all attached joysticks.
