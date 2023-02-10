@@ -54,12 +54,12 @@ function configure_supermodel3() {
 
     [[ "$md_mode" == "remove" ]] && return
 
-    mkUserDir "$md_inst/Saves"
-    mkUserDir "$md_inst/NVRAM"
     mkUserDir "$md_conf_root/$md_id"
+    mkUserDir "$md_conf_root/$md_id/Saves"
+    mkUserDir "$md_conf_root/$md_id/NVRAM"
 
-    ln -snf "$md_inst/NVRAM" "$home/NVRAM"
-    ln -snf "$md_inst/Saves" "$home/Saves"
+    ln -snf "$md_conf_root/$md_id/NVRAM" "$md_inst/NVRAM"
+    ln -snf "$md_conf_root/$md_id/Saves" "$md_inst/Saves"
     ln -snf "$md_conf_root/$md_id" "$home/Config"
     ln -snf "$md_conf_root/$md_id" "$md_inst/LocalConfig"
 
