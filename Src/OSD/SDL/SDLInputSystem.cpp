@@ -409,7 +409,6 @@ void CSDLInputSystem::CloseJoysticks()
   }
 
   m_mseDetails.clear();
-  m_manyMouseData.clear();
   ManyMouse_Quit();
 }
 
@@ -429,8 +428,7 @@ bool CSDLInputSystem::InitializeSystem()
 
   // Initiate ManyMouse
   available_mice = ManyMouse_Init();
-  static Mouse mice[MAX_MICE];
-  static MouseDetails detail[MAX_MICE];
+  static MouseDetails mice[MAX_MICE];
 
   std::cout << std::endl;
 
@@ -439,13 +437,9 @@ bool CSDLInputSystem::InitializeSystem()
      const char *name = ManyMouse_DeviceName(i);
      strncpy(mice[i].name, name, sizeof (mice[i].name));
      mice[i].name[sizeof (mice[i].name) - 1] = '\0';
-     strncpy(detail[i].name, name, sizeof (detail[i].name));
-     detail[i].name[sizeof (detail[i].name) - 1] = '\0';
 
-     mice[i].connected = 1;
-
-     m_manyMouseData.push_back(mice[i]);
-     m_mseDetails.push_back(detail[i]);
+     mice[i].isAbsolute = true;
+     m_mseDetails.push_back(mice[i]);
 
      std::cout << "#" << i << ": " << mice[i].name << std::endl;
   }
@@ -626,7 +620,7 @@ const JoyDetails *CSDLInputSystem::GetJoyDetails(int joyNum)
 bool CSDLInputSystem::Poll()
 {
   // Reset mouse wheel direction
-  for (int i = 0; i < MAX_MICE; i++) {
+  for (int i = 0; i < available_mice; i++) {
      m_mouseWheelDir[i] = 0;
   }
 

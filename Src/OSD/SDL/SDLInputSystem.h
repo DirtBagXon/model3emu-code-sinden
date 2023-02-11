@@ -104,7 +104,6 @@ private:
 		Uint32 scrolllefttick;
 		Uint32 scrollrighttick;
 	};
-	std::vector<Mouse> m_manyMouseData;
 	std::vector<MouseDetails> m_mseDetails;
 
 	/*
