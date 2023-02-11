@@ -39,7 +39,7 @@
 #include <vector>
 using namespace std;
 
-static int available_mice = 0;
+static int available_mice = 1;
 static ManyMouseEvent mm_event;
 
 SDLKeyMapStruct CSDLInputSystem::s_keyMap[] =
@@ -426,6 +426,7 @@ bool CSDLInputSystem::InitializeSystem()
   // Open attached joysticks
   OpenJoysticks();
 
+#if not defined(__APPLE__) && not defined(_WIN32)
   // Initiate ManyMouse
   available_mice = ManyMouse_Init();
   static MouseDetails mice[MAX_MICE];
@@ -448,6 +449,7 @@ bool CSDLInputSystem::InitializeSystem()
   std::cout << std::endl;
 
   SDL_SetWindowGrab(get_window(), SDL_TRUE);
+#endif
 
   return true;
 }
@@ -500,8 +502,13 @@ bool CSDLInputSystem::IsMouseButPressed(int mseNum, int butNum)
   switch (butNum)
   {
     case 0:  return !!(m_mouseButtons[mseNum] & SDL_BUTTON_LMASK);
+#if defined(__APPLE__) || defined(_WIN32)
+    case 1:  return !!(m_mouseButtons[mseNum] & SDL_BUTTON_MMASK);
+    case 2:  return !!(m_mouseButtons[mseNum] & SDL_BUTTON_RMASK);
+#else
     case 1:  return !!(m_mouseButtons[mseNum] & SDL_BUTTON_RMASK);
     case 2:  return !!(m_mouseButtons[mseNum] & SDL_BUTTON_MMASK);
+#endif
     case 3:  return !!(m_mouseButtons[mseNum] & SDL_BUTTON_X1MASK);
     case 4:  return !!(m_mouseButtons[mseNum] & SDL_BUTTON_X2MASK);
     default: return false;
@@ -634,12 +641,27 @@ bool CSDLInputSystem::Poll()
 	    break;
 		case SDL_QUIT:
 			return false;
+#if defined(__APPLE__) || defined(_WIN32)
+		case SDL_MOUSEWHEEL:
+			if (e.button.y > 0)
+			{
+				m_mouseZ[0] += 5;
+				m_mouseWheelDir[0] = 1;
+			}
+			else if (e.button.y < 0)
+			{
+				m_mouseZ[0] -= 5;
+				m_mouseWheelDir[0] = -1;
+			}
+			break;
+#endif
 		}
   }
 
   // Get key state from SDL
   m_keyState = SDL_GetKeyboardState(nullptr);
 
+#if not defined(__APPLE__) && not defined(_WIN32)
   // Get mouse states from ManyMouse...
   while (ManyMouse_PollEvent(&mm_event)) {
 
@@ -717,6 +739,9 @@ bool CSDLInputSystem::Poll()
 
       }
   }
+#else
+	m_mouseButtons[0] = SDL_GetMouseState(&m_mouseX[0], &m_mouseY[0]);
+#endif
 
   return true;
 }
