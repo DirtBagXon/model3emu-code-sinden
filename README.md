@@ -13,10 +13,17 @@ Additional arguments:
                       0=none [Default], 1=standard, 2=wide
     -nomousecursor    Disable desktop mouse cursor in SDL Windowed mode
 
+**Note:**
+
+In _Linux_, you should now update _Supermodel.ini_ singular `MOUSE_` definitions to `MOUSEx_` index definitions.
+
+---
+
 For `arm` based systems, clone the `arm` branch:
 
     git clone --single-branch --branch arm https://github.com/DirtBagXon/model3emu-code-sinden.git
 
+---
 
 ![model3](screenshot.png)
 
