@@ -791,16 +791,13 @@ static void PrintGLError(GLenum error)
 static void UpdateCrosshairs(uint32_t currentInputs, CInputs *Inputs, unsigned crosshairs, unsigned borders)
 
 {
-
- // We piggyback this function for borders
-
-  bool offscreenTrigger[2];
-  float x[2], y[2];
-
   crosshairs &= 3;
   borders &= 3;
   if (!crosshairs && !borders)
     return;
+
+  bool offscreenTrigger[2];
+  float x[2], y[2];
 
   // Set up the viewport and orthogonal projection
   glUseProgram(0);    // no shaders
@@ -988,9 +985,10 @@ int Supermodel(const Game &game, ROMSet *rom_set, IEmulator *Model3, CInputs *In
   gameHasLightguns = !!(game.inputs & (Game::INPUT_GUN1|Game::INPUT_GUN2));
   gameHasLightguns |= game.name == "lostwsga";
   currentInputs = game.inputs;
-  videoInputs = Inputs;   // Force all games to use UpdateCrosshairs()
-                          // There is immediate return, without crosshair
-                          // or border arguments, in the draw function...
+  if (gameHasLightguns || s_runtime_config["Borders"].ValueAs<unsigned>())
+      videoInputs = Inputs;
+  else
+      videoInputs = NULL;
 
   // Attach the inputs to the emulator
   Model3->AttachInputs(Inputs);
