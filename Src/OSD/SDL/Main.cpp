@@ -788,7 +788,7 @@ static void PrintGLError(GLenum error)
 }
 */
 
-static void UpdateCrosshairs(uint32_t currentInputs, CInputs *Inputs, unsigned crosshairs, unsigned borders)
+static void UpdateVideoInput(uint32_t currentInputs, CInputs *Inputs, unsigned crosshairs, unsigned borders)
 
 {
   crosshairs &= 3;
@@ -873,7 +873,7 @@ bool BeginFrameVideo()
 void EndFrameVideo()
 {
   // Show crosshairs for light gun games
-  UpdateCrosshairs(currentInputs, videoInputs, s_runtime_config["Crosshairs"].ValueAs<unsigned>(),
+  UpdateVideoInput(currentInputs, videoInputs, s_runtime_config["Crosshairs"].ValueAs<unsigned>(),
 		    s_runtime_config["Borders"].ValueAs<unsigned>());
 
   // Swap the buffers

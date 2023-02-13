@@ -442,7 +442,7 @@ bool CSDLInputSystem::InitializeSystem()
      mice[i].isAbsolute = true;
      m_mseDetails.push_back(mice[i]);
 
-     std::cout << "#" << i << ": " << mice[i].name << std::endl;
+     std::cout << "#" << i + 1 << ": " << mice[i].name << std::endl;
   }
 
   std::cout << "Found " << available_mice << " available mice"  << std::endl;
@@ -674,7 +674,6 @@ bool CSDLInputSystem::Poll()
       float val, maxval;
 
       switch(mm_event.type) {
-
 	  case MANYMOUSE_EVENT_BUTTON:
 		if (mm_event.value == 1) {
 			mouse->buttons |= (1 << mm_event.item);
@@ -685,9 +684,7 @@ bool CSDLInputSystem::Poll()
 		m_mouseButtons[mm_event.device] = (Uint32)mouse->buttons;
 		break;
 	  case MANYMOUSE_EVENT_RELMOTION:
-
 		if (mm_event.item == 0) {
-
 			mouse->x += mm_event.value;
 			if (mouse->x < 0) mouse->x = 0;
 			else if (mouse->x >= (int)get_total_width()) mouse->x = get_total_width();
@@ -695,7 +692,6 @@ bool CSDLInputSystem::Poll()
 			m_mouseX[mm_event.device] = mouse->x;
 		}
 		else if (mm_event.item == 1) {
-
 			mouse->y += mm_event.value;
 			if (mouse->y < 0) mouse->y = 0;
 			else if (mouse->y >= (int)get_total_height()) mouse->y = get_total_height();
@@ -716,7 +712,7 @@ bool CSDLInputSystem::Poll()
 			m_mouseY[mm_event.device] = mouse->y;
 		}
 		break;
-	case MANYMOUSE_EVENT_SCROLL:
+	  case MANYMOUSE_EVENT_SCROLL:
 		if (mm_event.item == 0)
 		{
 			if (mm_event.value > 0) {
@@ -736,7 +732,6 @@ bool CSDLInputSystem::Poll()
 		break;
 	  default:
 		break;
-
       }
   }
 #else
