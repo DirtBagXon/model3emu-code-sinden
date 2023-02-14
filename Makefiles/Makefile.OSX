@@ -55,8 +55,11 @@ LD = clang
 # SDL
 #
 
-SDL_CFLAGS =
-SDL_LIBS = -framework SDL2 -framework AGL -framework OpenGL -framework GLUT -framework Cocoa
+# Use ManyMouse for multiple Mice
+INPUT_CFLAGS = -DSUPERMODEL_MANYMOUSE
+
+SDL_CFLAGS = $(INPUT_CFLAGS)
+SDL_LIBS = -framework SDL2 -framework AGL -framework OpenGL -framework GLUT -framework Cocoa -framework IOKit -framework Carbon
 ifeq ($(strip $(NET_BOARD)),1)
 	SDL_LIBS += -framework SDL2_net
 endif

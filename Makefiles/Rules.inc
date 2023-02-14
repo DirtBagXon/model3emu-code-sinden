@@ -147,6 +147,8 @@ SRC_FILES = \
 	Src/Inputs/InputSource.cpp \
 	Src/Inputs/InputSystem.cpp \
 	Src/Inputs/InputTypes.cpp \
+	Src/Inputs/Macosx_hidmanager.c \
+	Src/Inputs/Macosx_hidutilities.c \
 	Src/Inputs/Linux_evdev.c \
 	Src/Inputs/X11_xinput2.c \
 	Src/Inputs/Manymouse.c \

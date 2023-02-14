@@ -15,6 +15,8 @@ static const char *manymouse_copyright =
 
 extern const ManyMouseDriver *ManyMouseDriver_evdev;
 extern const ManyMouseDriver *ManyMouseDriver_xinput2;
+extern const ManyMouseDriver *ManyMouseDriver_hidmanager;
+extern const ManyMouseDriver *ManyMouseDriver_hidutilities;
 
 /*
  * These have to be in the favored order...obviously it doesn't matter if the
@@ -28,6 +30,8 @@ extern const ManyMouseDriver *ManyMouseDriver_xinput2;
  */
 static const ManyMouseDriver **mice_drivers[] =
 {
+    &ManyMouseDriver_hidmanager,
+    &ManyMouseDriver_hidutilities,
     &ManyMouseDriver_xinput2,
     &ManyMouseDriver_evdev
 };

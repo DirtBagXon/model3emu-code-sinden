@@ -3,7 +3,7 @@
 
 This is a fork of [model3emu-code](https://www.supermodel3.com) to add native **Sinden** light gun support.
 
-This fork uses [ManyMouse](https://github.com/icculus/manymouse) to provide 2 player gun support in Linux.
+This fork uses [ManyMouse](https://github.com/icculus/manymouse) to provide 2 player gun support in Linux and MacOSX.
 
 It will attempt to track the main git repo commits.
 
@@ -15,7 +15,9 @@ Additional arguments:
 
 **Note:**
 
-In _Linux_, you should now update _Supermodel.ini_ singular `MOUSE_` definitions to `MOUSEx_` _index_ definitions.
+_Linux/MacOSX_: Update _Supermodel.ini_ singular `MOUSE_` definitions to `MOUSEx_` _index_ definitions.
+
+_MacOSX_ launcher, possibly `Terminal`, will require _"Input Monitoring"_ permissions.
 
 ---
 

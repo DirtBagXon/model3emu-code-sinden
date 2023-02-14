@@ -58,11 +58,14 @@ LD = gcc
 SDL2_CFLAGS = `sdl2-config --cflags`
 SDL2_LIBS = `sdl2-config --libs`
 
+# Use ManyMouse for multiple Mice
+INPUT_CFLAGS = -DSUPERMODEL_MANYMOUSE
+
 #
 #	UNIX-specific
 #
 
-PLATFORM_CXXFLAGS = $(SDL2_CFLAGS) -O3
+PLATFORM_CXXFLAGS = $(SDL2_CFLAGS) $(INPUT_CFLAGS) -O3
 PLATFORM_LDFLAGS = $(SDL2_LIBS) -lGL -lGLU -lz -lm -lstdc++ -lpthread -lSDL2_net -ldl
 
 

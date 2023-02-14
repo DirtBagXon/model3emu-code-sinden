@@ -426,7 +426,7 @@ bool CSDLInputSystem::InitializeSystem()
   // Open attached joysticks
   OpenJoysticks();
 
-#if not defined(__APPLE__) && not defined(_WIN32)
+#ifdef SUPERMODEL_MANYMOUSE
   // Initiate ManyMouse
   available_mice = ManyMouse_Init();
   static MouseDetails mice[MAX_MICE];
@@ -502,7 +502,7 @@ bool CSDLInputSystem::IsMouseButPressed(int mseNum, int butNum)
   switch (butNum)
   {
     case 0:  return !!(m_mouseButtons[mseNum] & SDL_BUTTON_LMASK);
-#if defined(__APPLE__) || defined(_WIN32)
+#ifndef SUPERMODEL_MANYMOUSE
     case 1:  return !!(m_mouseButtons[mseNum] & SDL_BUTTON_MMASK);
     case 2:  return !!(m_mouseButtons[mseNum] & SDL_BUTTON_RMASK);
 #else
@@ -641,7 +641,7 @@ bool CSDLInputSystem::Poll()
 	    break;
 		case SDL_QUIT:
 			return false;
-#if defined(__APPLE__) || defined(_WIN32)
+#ifndef SUPERMODEL_MANYMOUSE
 		case SDL_MOUSEWHEEL:
 			if (e.button.y > 0)
 			{
@@ -661,7 +661,7 @@ bool CSDLInputSystem::Poll()
   // Get key state from SDL
   m_keyState = SDL_GetKeyboardState(nullptr);
 
-#if not defined(__APPLE__) && not defined(_WIN32)
+#ifdef SUPERMODEL_MANYMOUSE
   // Get mouse states from ManyMouse...
   while (ManyMouse_PollEvent(&mm_event)) {
 
