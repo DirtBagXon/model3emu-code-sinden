@@ -13,7 +13,9 @@ Additional arguments:
                       0=none [Default], 1=standard, 2=wide
     -nomousecursor    Disable desktop mouse cursor in SDL Windowed mode
 
-**Note:**
+**ManyMouse Notes:**
+
+Compile _Linux/MacOSX_ with `INPUT_CFLAGS = -DSUPERMODEL_MANYMOUSE` in _Makefile_
 
 _Linux/MacOSX_: Update _Supermodel.ini_ singular `MOUSE_` definitions to `MOUSEx_` _index_ definitions.
 
@@ -99,3 +101,42 @@ For network support:
 ```
 make -f Makefiles/Makefile.UNIX NET_BOARD=1
 ```
+
+### macOS
+
+Ensure Apple's Xcode Command Line Tools are installed:
+
+From a terminal:
+```
+xcode-select --install
+```
+
+Ensure SDL2 is installed.  Download the latest *.dmg files from both of the links below, and install per the READMEs in the .dmgs (i.e. in "/Library/Frameworks")
+
+* SDL2: https://github.com/libsdl-org/SDL/releases
+
+* SDL_net: https://github.com/libsdl-org/SDL_net/releases
+
+
+And then build Supermodel:
+
+```
+make -f Makefiles/Makefile.OSX
+```
+
+For network support:
+
+```
+make -f Makefiles/Makefile.OSX NET_BOARD=1
+```
+
+### Note: running on macOS
+If you try and run a macOS binary that was downloaded from the internet and/or built on a different machine, you need to grant macOS permission to execute the binary (just 1-time):
+
+* Open the folder containing the binary in Finder, and right (or ctrl) click on it:
+
+* Click "Open" when the following dialogue box appears : "macOS cannot verify the developer of “supermodel-git-xxxx”. Are you sure you want to open it?"
+
+* Close the terminal window that opens (after clicking open)
+
+Details: https://support.apple.com/guide/mac-help/open-a-mac-app-from-an-unidentified-developer-mh40616/mac
