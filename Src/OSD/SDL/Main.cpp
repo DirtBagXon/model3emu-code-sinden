@@ -182,7 +182,7 @@ static void GLAPIENTRY DebugCallback(GLenum source, GLenum type, GLuint id, GLen
 }
 
 // In windows with an nvidia card (sorry not tested anything else) you can customise the resolution.
-// This also allows you to set a totally custom refresh rate. Apparently you can drive most monitors at 
+// This also allows you to set a totally custom refresh rate. Apparently you can drive most monitors at
 // 57.5fps with no issues. Anyway this code will automatically pick up your custom refresh rate, and set it if it exists
 // It it doesn't exist, then it'll probably just default to 60 or whatever your refresh rate is.
 static void SetFullScreenRefreshRate()
@@ -833,7 +833,7 @@ private:
         const char* vertexShader = R"glsl(
 
             #version 410 core
-             
+
             uniform mat4 mvp;
             layout(location = 0) in vec3 inVertices;
 
@@ -846,7 +846,7 @@ private:
         const char* fragmentShader = R"glsl(
 
             #version 410 core
-             
+
             uniform vec4 colour;
             out vec4 fragColour;
 
@@ -1143,8 +1143,16 @@ int Supermodel(const Game &game, ROMSet *rom_set, IEmulator *Model3, CInputs *In
   sprintf(baseTitleStr, "Supermodel - %s", game.title.c_str());
   SDL_SetWindowTitle(s_window, baseTitleStr);
   SDL_SetWindowSize(s_window, totalXRes, totalYRes);
-  SDL_SetWindowPosition(s_window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
-  
+
+  int xpos = s_runtime_config["WindowXPosition"].Exists() ? s_runtime_config["WindowXPosition"].ValueAs<int>() : SDL_WINDOWPOS_CENTERED;
+  int ypos = s_runtime_config["WindowYPosition"].Exists() ? s_runtime_config["WindowYPosition"].ValueAs<int>() : SDL_WINDOWPOS_CENTERED;
+  SDL_SetWindowPosition(s_window, xpos, ypos);
+
+  if (s_runtime_config["BorderlessWindow"].ValueAs<bool>())
+  {
+    SDL_SetWindowBordered(s_window, SDL_FALSE);
+  }
+
   SetFullScreenRefreshRate();
 
   bool stretch = s_runtime_config["Stretch"].ValueAs<bool>();
@@ -1690,7 +1698,11 @@ static Util::Config::Node DefaultConfig()
   config.Set("QuadRendering", false);
   config.Set("XResolution", "496");
   config.Set("YResolution", "384");
+  config.SetEmpty("WindowXPosition");
+  config.SetEmpty("WindowYPosition");
   config.Set("FullScreen", false);
+  config.Set("BorderlessWindow", false);
+
   config.Set("WideScreen", false);
   config.Set("Stretch", false);
   config.Set("WideBackground", false);
@@ -1771,7 +1783,9 @@ static void Help(void)
   puts("");
   puts("Video Options:");
   puts("  -res=<x>,<y>            Resolution [Default: 496,384]");
+  puts("  -window-pos=<x>,<y>     Window position [Default: centered]");
   puts("  -window                 Windowed mode [Default]");
+  puts("  -borderless             Windowed mode with no border");
   puts("  -fullscreen             Full screen mode");
   puts("  -wide-screen            Expand 3D field of view to screen width");
   puts("  -wide-bg                When wide-screen mode is enabled, also expand the 2D");
@@ -1897,6 +1911,7 @@ static ParsedCommandLine ParseCommandLine(int argc, char **argv)
     { "-no-gpu-thread",       { "GPUMultiThreaded", false } },
     { "-window",              { "FullScreen",       false } },
     { "-fullscreen",          { "FullScreen",       true } },
+    { "-borderless",          { "BorderlessWindow", true } },
     { "-no-wide-screen",      { "WideScreen",       false } },
     { "-wide-screen",         { "WideScreen",       true } },
     { "-stretch",             { "Stretch",          true } },
@@ -2003,6 +2018,29 @@ static ParsedCommandLine ParseCommandLine(int argc, char **argv)
             cmd_line.error = true;
           }
         }
+      }
+      else if (arg == "-window-pos" || arg.find("-window-pos=") == 0)
+      {
+          std::vector<std::string> parts = Util::Format(arg).Split('=');
+          if (parts.size() != 2)
+          {
+              ErrorLog("'-window-pos' requires both an X and Y position (e.g., '-window-pos=10,0').");
+              cmd_line.error = true;
+          }
+          else
+          {
+              int xpos, ypos;
+              if (2 == sscanf(&argv[i][11], "=%d,%d", &xpos, &ypos))
+              {
+                  cmd_line.config.Set("WindowXPosition", xpos);
+                  cmd_line.config.Set("WindowYPosition", ypos);
+              }
+              else
+              {
+                  ErrorLog("'-window-pos' requires both an X and Y position (e.g., '-window-pos=10,0').");
+                  cmd_line.error = true;
+              }
+          }
       }
       else if (arg == "-true-hz")
         cmd_line.config.Set("RefreshRate", 57.524f);
