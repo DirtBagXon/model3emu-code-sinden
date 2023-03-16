@@ -1596,7 +1596,8 @@ static void Help(void)
   puts("  -no-vsync               Do not lock to vertical refresh rate");
   puts("  -true-hz                Use true Model 3 refresh rate of 57.524 Hz");
   puts("  -show-fps               Display frame rate in window title bar");
-  puts("  -borders=<n>            Sinden border configuration for gun games:");
+  puts("  -borders=<n>            Alias of -sinden=<n>");
+  puts("  -sinden=<n>             Sinden border configuration for gun games:");
   puts("                          0=none [Default], 1=standard, 2=wide");
   puts("  -crosshairs=<n>         Crosshairs configuration for gun games:");
   puts("                          0=none [Default], 1=P1 only, 2=P2 only, 3=P1 & P2");
@@ -1687,6 +1688,7 @@ static ParsedCommandLine ParseCommandLine(int argc, char **argv)
     { "-ppc-frequency",         "PowerPCFrequency"        },
     { "-crosshairs",            "Crosshairs"              },
     { "-borders",               "Borders"                 },
+    { "-sinden",                "Borders"                 },
     { "-vert-shader",           "VertexShader"            },
     { "-frag-shader",           "FragmentShader"          },
     { "-vert-shader-fog",       "VertexShaderFog"         },

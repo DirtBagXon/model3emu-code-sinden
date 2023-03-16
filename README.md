@@ -16,7 +16,7 @@ Use `supermodel3.sh` for _RetroPie-Setup_
 
 ### Additional arguments:
 
-    -borders=<n>      Sinden border configuration for gun games:
+    -sinden=<n>       Sinden border configuration for gun games:
                       0=none [Default], 1=standard, 2=wide
     -nomousecursor    Disable desktop mouse cursor in SDL Windowed mode
 
