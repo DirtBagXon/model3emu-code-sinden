@@ -154,6 +154,7 @@ SRC_FILES = \
 	Src/Inputs/Manymouse.c \
 	Src/Inputs/MultiInputSource.cpp \
 	Src/OSD/SDL/SDLInputSystem.cpp \
+	Src/OSD/SDL/Crosshair.cpp \
 	Src/OSD/Outputs.cpp \
 	Src/Sound/MPEG/MpegAudio.cpp \
 	Src/Model3/Crypto.cpp \

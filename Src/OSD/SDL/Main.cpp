@@ -81,6 +81,7 @@
 #include <iostream>
 #include "Util/BMPFile.h"
 
+#include "Crosshair.h"
 
 /******************************************************************************
  Global Run-time Config
@@ -109,6 +110,11 @@ static unsigned  totalXRes, totalYRes;  // total resolution (the whole GL viewpo
 
 unsigned int get_total_width() { return totalXRes; }
 unsigned int get_total_height() { return totalYRes; }
+
+/*
+ * Crosshair stuff
+ */
+static CCrosshair* s_crosshair = nullptr;
 
 static bool SetGLGeometry(unsigned *xOffsetPtr, unsigned *yOffsetPtr, unsigned *xResPtr, unsigned *yResPtr, unsigned *totalXResPtr, unsigned *totalYResPtr, bool keepAspectRatio)
 {
@@ -779,182 +785,6 @@ static void LoadNVRAM(IEmulator *Model3)
   DebugLog("Loaded NVRAM from '%s'.\n", file_path.c_str());
 }
 
-
-/******************************************************************************
- UI Rendering
-
- Currently, only does crosshairs for light gun games.
-******************************************************************************/
-
-struct BasicDraw
-{
-public:
-
-    struct BasicVertex
-    {
-        BasicVertex(float x, float y, float z) : x(x), y(y), z(z) {}
-        BasicVertex(float x, float y) : x(x), y(y), z(0.f) {}
-        float x, y, z;
-    };
-
-    const int MaxVerts = 1024;  // per draw call
-
-    void Draw(GLenum mode, const float mvpMatrix[16], const BasicVertex* vertices, int count, float r, float g, float b, float a)
-    {
-        if (count > MaxVerts) {
-            count = MaxVerts;       // maybe we could error out somehow
-        }
-
-        if (!m_initialised) {
-            Setup();
-        }
-
-        m_shader.EnableShader();
-
-        // update uniform memory
-        glUniformMatrix4fv(m_shader.uniformLocMap["mvp"], 1, GL_FALSE, mvpMatrix);
-        glUniform4f(m_shader.uniformLocMap["colour"], r, g, b, a);
-
-        // update vbo mem
-        m_vbo.Bind(true);
-        m_vbo.BufferSubData(0, count * sizeof(BasicVertex), vertices);
-
-        glBindVertexArray(m_vao);
-        glDrawArrays(mode, 0, count);
-        glBindVertexArray(0);
-
-        m_shader.DisableShader();
-    }
-
-private:
-
-    void Setup()
-    {
-        const char* vertexShader = R"glsl(
-
-            #version 410 core
-
-            uniform mat4 mvp;
-            layout(location = 0) in vec3 inVertices;
-
-            void main(void)
-            {
-	            gl_Position = mvp * vec4(inVertices,1.0);
-            }
-            )glsl";
-
-        const char* fragmentShader = R"glsl(
-
-            #version 410 core
-
-            uniform vec4 colour;
-            out vec4 fragColour;
-
-            void main(void)
-            {
-	            fragColour = colour;
-            }
-            )glsl";
-
-        m_shader.LoadShaders(vertexShader, fragmentShader);
-        m_shader.GetUniformLocationMap("mvp");
-        m_shader.GetUniformLocationMap("colour");
-
-        glGenVertexArrays(1, &m_vao);
-        glBindVertexArray(m_vao);
-
-        m_vbo.Create(GL_ARRAY_BUFFER, GL_DYNAMIC_DRAW, sizeof(BasicVertex) * (MaxVerts));
-        m_vbo.Bind(true);
-
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(BasicVertex), 0);
-
-        glBindVertexArray(0);
-        m_vbo.Bind(false);
-
-        m_initialised = true;
-    }
-
-    GLSLShader m_shader;
-    VBO m_vbo;
-    GLuint m_vao = 0;
-    bool m_initialised = false;
-
-} basicDraw;
-
-static void GunToViewCoords(float *x, float *y)
-{
-  *x = (*x-150.0f)/(651.0f-150.0f); // Scale [150,651] -> [0.0,1.0]
-  *y = (*y-80.0f)/(465.0f-80.0f);   // Scale [80,465] -> [0.0,1.0]
-}
-
-static void DrawCrosshair(const float* matrix, float x, float y, float r, float g, float b)
-{
-  float base = 0.01f, height = 0.02f; // geometric parameters of each triangle
-  float dist = 0.004f;          // distance of triangle tip from center
-  float a = (float)xRes/(float)yRes;  // aspect ratio (to square the crosshair)
-
-  std::vector<BasicDraw::BasicVertex> verts;
-
-  verts.emplace_back(x, y+dist);  // bottom triangle
-  verts.emplace_back(x+base/2.0f, y+(dist+height)*a);
-  verts.emplace_back(x-base/2.0f, y+(dist+height)*a);
-  verts.emplace_back(x, y-dist);  // top triangle
-  verts.emplace_back(x-base/2.0f, y-(dist+height)*a);
-  verts.emplace_back(x+base/2.0f, y-(dist+height)*a);
-  verts.emplace_back(x-dist, y);  // left triangle
-  verts.emplace_back(x-dist-height, y+(base/2.0f)*a);
-  verts.emplace_back(x-dist-height, y-(base/2.0f)*a);
-  verts.emplace_back(x+dist, y);  // right triangle
-  verts.emplace_back(x+dist+height, y-(base/2.0f)*a);
-  verts.emplace_back(x+dist+height, y+(base/2.0f)*a);
-
-  basicDraw.Draw(GL_TRIANGLES, matrix, verts.data(), (int)verts.size(), r, g, b, 1.0f);
-}
-
-static void DrawBorder(const float* matrix, bool boost)
-{
-  std::vector<BasicDraw::BasicVertex> verts;
-
-  float f = 0.0f, w = 0.0f, z = 0.0f;
-
-  if (boost) {
-      f = 0.006f;
-      z = 0.0015f;
-  }
-
-  w = float(0.022f + (f + z)); //top
-  verts.emplace_back(0.0f, w);
-  verts.emplace_back(0.0f, 0.0f);
-  verts.emplace_back(1.0f, 0.0f);
-  verts.emplace_back(1.0f, 0.0f);
-  verts.emplace_back(1.0f, w);
-  verts.emplace_back(0.0f, w);
-  w = float(0.984f - f); //right
-  verts.emplace_back(w, 1.0f);
-  verts.emplace_back(w, 0.0f);
-  verts.emplace_back(1.0f, 0.0f);
-  verts.emplace_back(1.0f, 0.0f);
-  verts.emplace_back(1.0f, 1.0f);
-  verts.emplace_back(w, 1.0f);
-  w = float(0.978f - (f + z)); //bottom
-  verts.emplace_back(0.0f, 1.0f);
-  verts.emplace_back(0.0f, w);
-  verts.emplace_back(1.0f, w);
-  verts.emplace_back(1.0f, w);
-  verts.emplace_back(1.0f, 1.0f);
-  verts.emplace_back(0.0f, 1.0f);
-  w = float(0.016f + f); //left
-  verts.emplace_back(0.0f, 1.0f);
-  verts.emplace_back(0.0f, 0.0f);
-  verts.emplace_back(w, 0.0f);
-  verts.emplace_back(w, 0.0f);
-  verts.emplace_back(w, 1.0f);
-  verts.emplace_back(0.0f, 1.0f);
-
-  basicDraw.Draw(GL_TRIANGLES, matrix, verts.data(), (int)verts.size(), 1.0f, 1.0f, 1.0f, 1.0f);
-}
-
 /*
 static void PrintGLError(GLenum error)
 {
@@ -973,70 +803,6 @@ static void PrintGLError(GLenum error)
 }
 */
 
-static void UpdateVideoInput(uint32_t currentInputs, CInputs *Inputs, unsigned crosshairs, unsigned borders)
-
-{
-  crosshairs &= 3;
-  borders &= 3;
-  if (!crosshairs && !borders)
-    return;
-
-  bool offscreenTrigger[2];
-  float x[2], y[2];
-
-  // Set up the viewport and orthogonal projection
-  glUseProgram(0);    // no shaders
-  glViewport(xOffset, yOffset, xRes, yRes);
-  glDisable(GL_BLEND);    // no blending
-  glDisable(GL_DEPTH_TEST); // no Z-buffering needed
-
-  New3D::Mat4 m;
-  m.Ortho(0.0, 1.0, 1.0, 0.0, -1.0f, 1.0f);
-
-  // Convert gun coordinates to viewspace coordinates
-  if (crosshairs) {
-      if (currentInputs & Game::INPUT_ANALOG_GUN1)
-      {
-        x[0] = ((float)Inputs->analogGunX[0]->value / 255.0f);
-        y[0] = ((255.0f - (float)Inputs->analogGunY[0]->value) / 255.0f);
-        offscreenTrigger[0] = Inputs->analogTriggerLeft[0]->value || Inputs->analogTriggerRight[0]->value;
-      }
-      else if (currentInputs & Game::INPUT_GUN1)
-      {
-        x[0] = (float)Inputs->gunX[0]->value;
-        y[0] = (float)Inputs->gunY[0]->value;
-        GunToViewCoords(&x[0], &y[0]);
-	offscreenTrigger[0] = (Inputs->trigger[0]->offscreenValue) > 0;
-      }
-      if (currentInputs & Game::INPUT_ANALOG_GUN2)
-      {
-        x[1] = ((float)Inputs->analogGunX[1]->value / 255.0f);
-        y[1] = ((255.0f - (float)Inputs->analogGunY[1]->value) / 255.0f);
-        offscreenTrigger[1] = Inputs->analogTriggerLeft[1]->value || Inputs->analogTriggerRight[1]->value;
-      }
-      else if (currentInputs & Game::INPUT_GUN2)
-      {
-        x[1] = (float)Inputs->gunX[1]->value;
-        y[1] = (float)Inputs->gunY[1]->value;
-        GunToViewCoords(&x[1], &y[1]);
-	offscreenTrigger[1] = (Inputs->trigger[1]->offscreenValue) > 0;
-      }
-      if ((crosshairs & 1) && !offscreenTrigger[0])  // Player 1
-        DrawCrosshair(m,x[0], y[0], 1.0f, 0.0f, 0.0f);
-      if ((crosshairs & 2) && !offscreenTrigger[1])  // Player 2
-        DrawCrosshair(m,x[1], y[1], 0.0f, 1.0f, 0.0f);
-  }
-
-  // Border width
-  if (borders & 2)
-       DrawBorder(m, true);
-  else if (borders & 1)
-       DrawBorder(m, false);
-
-  //PrintGLError(glGetError());
-}
-
-
 /******************************************************************************
  Video Callbacks
 ******************************************************************************/
@@ -1052,8 +818,7 @@ bool BeginFrameVideo()
 void EndFrameVideo()
 {
   // Show crosshairs for light gun games
-  UpdateVideoInput(currentInputs, videoInputs, s_runtime_config["Crosshairs"].ValueAs<unsigned>(),
-		    s_runtime_config["Borders"].ValueAs<unsigned>());
+  s_crosshair->Update(currentInputs, videoInputs, xOffset, yOffset);
 
   // Swap the buffers
   SDL_GL_SwapWindow(s_window);
@@ -1712,6 +1477,7 @@ static Util::Config::Node DefaultConfig()
   config.Set("ShowFrameRate", false);
   config.Set("Borders", int(0));
   config.Set("Crosshairs", int(0));
+  config.Set("CrosshairStyle", "vector");
   config.Set("MouseCursor", true);
   config.Set("FlipStereo", false);
 #ifdef SUPERMODEL_WIN32
@@ -1796,12 +1562,14 @@ static void Help(void)
   puts("  -no-vsync               Do not lock to vertical refresh rate");
   puts("  -true-hz                Use true Model 3 refresh rate of 57.524 Hz");
   puts("  -show-fps               Display frame rate in window title bar");
-  puts("  -borders=<n>            Sinden border configuration for gun games:");
-  puts("                          0=none [Default], 1=standard, 2=wide");
+  puts("  -borders=<n>            Alias of -sinden=<n>");
   puts("  -crosshairs=<n>         Crosshairs configuration for gun games:");
   puts("                          0=none [Default], 1=P1 only, 2=P2 only, 3=P1 & P2");
-  puts("  -nomousecursor          Disable desktop mouse cursor in SDL Windowed mode");
+  puts("  -crosshair-style=<s>    Crosshair style: vector or bmp. [Default: vector]");
+  puts("  -sinden=<n>             Sinden border configuration for gun games:");
+  puts("                          0=none [Default], 1=standard, 2=wide");
   puts("  -new3d                  New 3D engine by Ian Curtis [Default]");
+  puts("  -nomousecursor          Disable desktop mouse cursor in SDL Windowed mode");
   puts("  -quad-rendering         Enable proper quad rendering");
   puts("  -legacy3d               Legacy 3D engine (faster but less accurate)");
   puts("  -multi-texture          Use 8 texture maps for decoding (legacy engine)");
@@ -1886,7 +1654,9 @@ static ParsedCommandLine ParseCommandLine(int argc, char **argv)
     { "-load-state",            "InitStateFile"           },
     { "-ppc-frequency",         "PowerPCFrequency"        },
     { "-crosshairs",            "Crosshairs"              },
+    { "-crosshair-style",       "CrosshairStyle"          },
     { "-borders",               "Borders"                 },
+    { "-sinden",                "Borders"                 },
     { "-vert-shader",           "VertexShader"            },
     { "-frag-shader",           "FragmentShader"          },
     { "-vert-shader-fog",       "VertexShaderFog"         },
@@ -2199,6 +1969,15 @@ int main(int argc, char **argv)
     goto Exit;
   }
 
+  // Create Crosshair
+  s_crosshair = new CCrosshair(s_runtime_config);
+  if (s_crosshair->Init() != OKAY)
+  {
+      ErrorLog("Unable to load bitmap crosshair texture\n");
+      exitCode = 1;
+      goto Exit;
+  }
+
   // Create Model 3 emulator
 #ifdef DEBUG
   Model3 = s_gfxStatePath.empty() ? static_cast<IEmulator *>(new CModel3(s_runtime_config)) : static_cast<IEmulator *>(new CModel3GraphicsState(s_runtime_config, s_gfxStatePath));
@@ -2301,6 +2080,8 @@ Exit:
     delete InputSystem;
   if (Outputs != NULL)
     delete Outputs;
+  if (s_crosshair != NULL)
+    delete s_crosshair;
   DestroyGLScreen();
   SDL_Quit();
 
