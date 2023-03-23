@@ -1,7 +1,7 @@
 /**
  ** Supermodel
  ** A Sega Model 3 Arcade Emulator.
- ** Copyright 2003-2022 The Supermodel Team
+ ** Copyright 2003-2023 The Supermodel Team
  **
  ** This file is part of Supermodel.
  **
@@ -45,13 +45,8 @@ bool CCrosshair::Init()
         m_isBitmapCrosshair = false;
     }
 
-    m_xRes = m_config["XResolution"].ValueAs<unsigned>();
-    m_yRes = m_config["YResolution"].ValueAs<unsigned>();
-    m_a = (float)m_xRes / (float)m_yRes;
-
     SDL_Surface* surfaceCrosshairP1 = SDL_LoadBMP(p1CrosshairFile.c_str());
     SDL_Surface* surfaceCrosshairP2 = SDL_LoadBMP(p2CrosshairFile.c_str());
-
     if (surfaceCrosshairP1 == NULL || surfaceCrosshairP2 == NULL)
         return FAIL;
 
@@ -88,31 +83,6 @@ bool CCrosshair::Init()
     m_uvCoord.emplace_back(0.0f, 0.0f);
     m_uvCoord.emplace_back(1.0f, 1.0f);
     m_uvCoord.emplace_back(0.0f, 1.0f);
-
-    if (!m_isBitmapCrosshair)
-    {
-        m_verts.emplace_back(0.0f, m_dist);  // bottom triangle
-        m_verts.emplace_back(m_base / 2.0f, (m_dist + m_height) * m_a);
-        m_verts.emplace_back(-m_base / 2.0f, (m_dist + m_height) * m_a);
-        m_verts.emplace_back(0.0f, -m_dist);  // top triangle
-        m_verts.emplace_back(-m_base / 2.0f, -(m_dist + m_height) * m_a);
-        m_verts.emplace_back(m_base / 2.0f, -(m_dist + m_height) * m_a);
-        m_verts.emplace_back(-m_dist, 0.0f);  // left triangle
-        m_verts.emplace_back(-m_dist - m_height, (m_base / 2.0f) * m_a);
-        m_verts.emplace_back(-m_dist - m_height, -(m_base / 2.0f) * m_a);
-        m_verts.emplace_back(m_dist, 0.0f);  // right triangle
-        m_verts.emplace_back(m_dist + m_height, -(m_base / 2.0f) * m_a);
-        m_verts.emplace_back(m_dist + m_height, (m_base / 2.0f) * m_a);
-    }
-    else
-    {
-        m_verts.emplace_back(-m_squareSize / 2.0f, -m_squareSize / 2.0f * m_a);
-        m_verts.emplace_back(m_squareSize / 2.0f, -m_squareSize / 2.0f * m_a);
-        m_verts.emplace_back(m_squareSize / 2.0f, m_squareSize / 2.0f * m_a);
-        m_verts.emplace_back(-m_squareSize / 2.0f, -m_squareSize / 2.0f * m_a);
-        m_verts.emplace_back(m_squareSize / 2.0f, m_squareSize / 2.0f * m_a);
-        m_verts.emplace_back(-m_squareSize / 2.0f, m_squareSize / 2.0f * m_a);
-    }
 
     m_vertexShader = R"glsl(
 
@@ -179,10 +149,42 @@ bool CCrosshair::Init()
     return OKAY;
 }
 
-void CCrosshair::DrawCrosshair(New3D::Mat4 matrix, float x, float y, int player)
+void CCrosshair::BuildCrosshairVertices(unsigned int xRes, unsigned int yRes)
+{
+  float aspect = (float)xRes / (float)yRes;
+  m_verts.clear();
+  if (!m_isBitmapCrosshair)
+  {
+    m_verts.emplace_back(0.0f, m_dist);  // bottom triangle
+    m_verts.emplace_back(m_base / 2.0f, (m_dist + m_height) * aspect);
+    m_verts.emplace_back(-m_base / 2.0f, (m_dist + m_height) * aspect);
+    m_verts.emplace_back(0.0f, -m_dist);  // top triangle
+    m_verts.emplace_back(-m_base / 2.0f, -(m_dist + m_height) * aspect);
+    m_verts.emplace_back(m_base / 2.0f, -(m_dist + m_height) * aspect);
+    m_verts.emplace_back(-m_dist, 0.0f);  // left triangle
+    m_verts.emplace_back(-m_dist - m_height, (m_base / 2.0f) * aspect);
+    m_verts.emplace_back(-m_dist - m_height, -(m_base / 2.0f) * aspect);
+    m_verts.emplace_back(m_dist, 0.0f);  // right triangle
+    m_verts.emplace_back(m_dist + m_height, -(m_base / 2.0f) * aspect);
+    m_verts.emplace_back(m_dist + m_height, (m_base / 2.0f) * aspect);
+  }
+  else
+  {
+    m_verts.emplace_back(-m_squareSize / 2.0f, -m_squareSize / 2.0f * aspect);
+    m_verts.emplace_back(m_squareSize / 2.0f, -m_squareSize / 2.0f * aspect);
+    m_verts.emplace_back(m_squareSize / 2.0f, m_squareSize / 2.0f * aspect);
+    m_verts.emplace_back(-m_squareSize / 2.0f, -m_squareSize / 2.0f * aspect);
+    m_verts.emplace_back(m_squareSize / 2.0f, m_squareSize / 2.0f * aspect);
+    m_verts.emplace_back(-m_squareSize / 2.0f, m_squareSize / 2.0f * aspect);
+  }
+}
+
+void CCrosshair::DrawCrosshair(New3D::Mat4 matrix, float x, float y, int player, unsigned int xRes, unsigned int yRes)
 {
     float r=0.0f, g=0.0f, b=0.0f;
     int count = (int)m_verts.size();
+
+    BuildCrosshairVertices(xRes, yRes);
 
     if (count > MaxVerts) {
         count = MaxVerts;       // maybe we could error out somehow
@@ -249,7 +251,7 @@ void CCrosshair::DrawCrosshair(New3D::Mat4 matrix, float x, float y, int player)
     m_shader.DisableShader();
 }
 
-void CCrosshair::Update(uint32_t currentInputs, CInputs* Inputs, unsigned int xOffset, unsigned int yOffset)
+void CCrosshair::Update(uint32_t currentInputs, CInputs* Inputs, unsigned int xOffset, unsigned int yOffset, unsigned int xRes, unsigned int yRes)
 {
     bool offscreenTrigger[2]{false};
     float x[2]{ 0.0f }, y[2]{ 0.0f };
@@ -264,7 +266,7 @@ void CCrosshair::Update(uint32_t currentInputs, CInputs* Inputs, unsigned int xO
 
     // Set up the viewport and orthogonal projection
     glUseProgram(0);    // no shaders
-    glViewport(xOffset, yOffset, m_xRes, m_yRes);
+    glViewport(xOffset, yOffset, xRes, yRes);
     glDisable(GL_DEPTH_TEST); // no Z-buffering needed
 
     if (!m_isBitmapCrosshair)
@@ -315,11 +317,11 @@ void CCrosshair::Update(uint32_t currentInputs, CInputs* Inputs, unsigned int xO
 
         if ((crosshairs & 1) && !offscreenTrigger[0]) // Player 1
         {
-            DrawCrosshair(m, x[0], y[0], 0);
+            DrawCrosshair(m, x[0], y[0], 0, xRes, yRes);
         }
         if ((crosshairs & 2) && !offscreenTrigger[1]) // Player 2
         {
-            DrawCrosshair(m, x[1], y[1], 1);
+            DrawCrosshair(m, x[1], y[1], 1, xRes, yRes);
         }
     }
 
@@ -341,10 +343,11 @@ void CCrosshair::GunToViewCoords(float* x, float* y)
     *y = (*y - 80.0f) / (465.0f - 80.0f);   // Scale [80,465] -> [0.0,1.0]
 }
 
-CCrosshair::CCrosshair(const Util::Config::Node& config) : m_config(config),m_xRes(0),m_yRes(0)
+CCrosshair::CCrosshair(const Util::Config::Node& config)
+  : m_config(config),
+    m_vertexShader(nullptr),
+    m_fragmentShader(nullptr)
 {
-    m_vertexShader = nullptr;
-    m_fragmentShader = nullptr;
 }
 
 CCrosshair::~CCrosshair()

@@ -1,7 +1,7 @@
 /**
  ** Supermodel
  ** A Sega Model 3 Arcade Emulator.
- ** Copyright 2003-2022 The Supermodel Team
+ ** Copyright 2003-2023 The Supermodel Team
  **
  ** This file is part of Supermodel.
  **
@@ -71,7 +71,8 @@ private:
 
 	const int MaxVerts = 1024;  // per draw call
 
-	void DrawCrosshair(New3D::Mat4 matrix, float x, float y, int player);
+	void BuildCrosshairVertices(unsigned int xRes, unsigned int yRes);
+	void DrawCrosshair(New3D::Mat4 matrix, float x, float y, int player, unsigned int xRes, unsigned int yRes);
 	void DrawBorder(New3D::Mat4 matrix, bool wide);
 	void GunToViewCoords(float* x, float* y);
 
@@ -79,7 +80,7 @@ public:
 	CCrosshair(const Util::Config::Node& config);
 	~CCrosshair();
 	bool Init();
-	void Update(uint32_t currentInputs, CInputs* Inputs, unsigned int, unsigned int);
+	void Update(uint32_t currentInputs, CInputs* Inputs, unsigned int xOffset, unsigned int yOffset, unsigned int xRes, unsigned int yRes);
 };
 
 #endif
