@@ -71,7 +71,7 @@ private:
 
 	const int MaxVerts = 1024;  // per draw call
 
-	void BuildCrosshairVertices(unsigned int xRes, unsigned int yRes);
+	void BuildCrosshairVertices();
 	void DrawCrosshair(New3D::Mat4 matrix, float x, float y, int player, unsigned int xRes, unsigned int yRes);
 	void DrawBorder(New3D::Mat4 matrix, bool wide);
 	void GunToViewCoords(float* x, float* y);
