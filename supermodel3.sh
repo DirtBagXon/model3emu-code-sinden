@@ -59,9 +59,12 @@ function configure_supermodel3() {
     mkUserDir "$md_conf_root/$md_id/NVRAM"
 
     ln -snf "$md_conf_root/$md_id/NVRAM" "$md_inst/NVRAM"
+    ln -snf "$md_conf_root/$md_id/NVRAM" "$home/NVRAM"
     ln -snf "$md_conf_root/$md_id/Saves" "$md_inst/Saves"
+    ln -snf "$md_conf_root/$md_id/Saves" "$home/Saves"
     ln -snf "$md_conf_root/$md_id" "$home/Config"
     ln -snf "$md_conf_root/$md_id" "$md_inst/LocalConfig"
+    ln -snf "$md_conf_root/$md_id" "$home/LocalConfig"
 
     copyDefaultConfig "$md_inst/Config/Supermodel.ini" "$md_conf_root/$md_id/Supermodel.ini"
     copyDefaultConfig "$md_inst/Config/Games.xml" "$md_conf_root/$md_id/Games.xml"
