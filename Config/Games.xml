@@ -174,7 +174,6 @@
       <drive_board>Wheel</drive_board>
       <real3d_status_bit_set_percent_of_frame>24</real3d_status_bit_set_percent_of_frame>
       <netboard>true</netboard>
-	  <audio>QuadFrontRear</audio>
       <inputs>
         <input type="common" />
         <input type="vehicle" />
@@ -267,7 +266,6 @@
       <mpeg_board>DSB2</mpeg_board>
       <drive_board>Wheel</drive_board>
       <netboard>true</netboard>
-      <audio>QuadFrontRear</audio>
       <inputs>
         <input type="common" />
         <input type="vehicle" />
@@ -1123,7 +1121,6 @@
     <hardware>
       <platform>Sega Model 3</platform>
       <stepping>1.5</stepping>
-	  <audio>QuadFrontRear</audio>
       <inputs>
         <input type="common" />
         <input type="gun1" />
@@ -1198,7 +1195,6 @@
     <hardware>
       <platform>Sega Model 3</platform>
       <stepping>1.5</stepping>
-      <audio>QuadFrontRear</audio>
       <inputs>
         <input type="common" />
         <input type="gun1" />
@@ -1434,7 +1430,6 @@
       <mpeg_board>DSB1</mpeg_board>
       <drive_board>Wheel</drive_board>
       <netboard>true</netboard>
-      <audio>QuadFrontRear</audio>
       <inputs>
         <input type="common" />
         <input type="vehicle" />
@@ -1519,7 +1514,6 @@
       <mpeg_board>DSB1</mpeg_board>
       <drive_board>Wheel</drive_board>
       <netboard>true</netboard>
-      <audio>QuadFrontRear</audio>
       <inputs>
         <input type="common" />
         <input type="vehicle" />
@@ -1554,7 +1548,6 @@
       <mpeg_board>DSB1</mpeg_board>
       <drive_board>Wheel</drive_board>
       <netboard>true</netboard>
-      <audio>QuadFrontRear</audio>
       <inputs>
         <input type="common" />
         <input type="vehicle" />
@@ -1627,7 +1620,6 @@
       <mpeg_board>DSB1</mpeg_board>
       <drive_board>Wheel</drive_board>
       <netboard>true</netboard>
-      <audio>QuadFrontRear</audio>
       <inputs>
         <input type="common" />
         <input type="vehicle" />
@@ -1675,7 +1667,6 @@
       <drive_board>Wheel</drive_board>
       <pci_bridge>MPC106</pci_bridge>
       <netboard>true</netboard>
-      <audio>QuadFrontRear</audio>
       <inputs>
         <input type="common" />
         <input type="vehicle" />
@@ -1970,7 +1961,6 @@
       <mpeg_board>DSB2</mpeg_board>
       <drive_board>Wheel</drive_board>
       <netboard>true</netboard>
-      <audio>QuadMix</audio>
       <inputs>
         <input type="common" />
         <input type="vehicle" />
@@ -2069,7 +2059,6 @@
       <stepping>2.0</stepping>
       <mpeg_board>DSB2</mpeg_board>
       <drive_board>Wheel</drive_board>
-      <audio>QuadMix</audio>
       <inputs>
         <input type="common" />
         <input type="vehicle" />
@@ -2179,7 +2168,6 @@
       <mpeg_board>DSB2</mpeg_board>
       <drive_board>Wheel</drive_board>
       <real3d_status_bit_set_percent_of_frame>48</real3d_status_bit_set_percent_of_frame>
-      <audio>QuadMix</audio>
       <inputs>
         <input type="common" />
         <input type="vehicle" />
