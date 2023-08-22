@@ -28,6 +28,7 @@ For `arm` based systems, clone the `arm` branch:
     git clone --single-branch --branch arm https://github.com/DirtBagXon/model3emu-code-sinden.git
 
 ---
+[![Two Player](https://img.youtube.com/vi/qplfGymaDPI/maxresdefault.jpg)](https://www.youtube.com/watch?v=qplfGymaDPI)
 
 ![model3](screenshot.png)
 
