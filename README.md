@@ -30,7 +30,7 @@ For `arm` based systems, clone the `arm` branch:
 ---
 [![Two Player](https://img.youtube.com/vi/qplfGymaDPI/maxresdefault.jpg)](https://www.youtube.com/watch?v=qplfGymaDPI)
 
-![model3](screenshot.png)
+<!-- ![model3](screenshot.png) -->
 
 ## Overview
 
