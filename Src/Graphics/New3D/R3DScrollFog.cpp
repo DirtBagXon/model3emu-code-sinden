@@ -40,7 +40,18 @@ vec3	lFogColor;
 vec4	scrollFog;
 
 // outputs
-out vec4 fragColor;
+layout(location = 0) out vec4 out0;		// opaque
+layout(location = 1) out vec4 out1;		// trans layer 1
+layout(location = 2) out vec4 out2;		// trans layer 2
+
+void WriteOutputs(vec4 colour)
+{
+	vec4 blank = vec4(0.0);
+	
+	out0 = colour;
+	out1 = blank;
+	out2 = blank;	
+}
 
 void main()
 {
@@ -62,7 +73,7 @@ void main()
 	scrollFog = vec4(lFogColor + lSpotFogColor, fogColour.a);
 
 	// Final Color
-	fragColor = scrollFog;
+	WriteOutputs(scrollFog);
 }
 
 )glsl";
@@ -71,7 +82,6 @@ void main()
 R3DScrollFog::R3DScrollFog(const Util::Config::Node &config)
   : m_config(config),
 	m_vao(0)
-
 {
 	m_shaderProgram		= 0;
 	m_vertexShader		= 0;
@@ -100,8 +110,6 @@ void R3DScrollFog::DrawScrollFog(float rgba[4], float attenuation, float ambient
 	// some ogl states
 	glDepthMask			(GL_FALSE);			// disable z writes
 	glDisable			(GL_DEPTH_TEST);	// disable depth testing
-	glEnable			(GL_BLEND);
-	glBlendFunc			(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	glBindVertexArray	(m_vao);
 	glUseProgram		(m_shaderProgram);
