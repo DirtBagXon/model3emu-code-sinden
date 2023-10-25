@@ -46,7 +46,6 @@
 #endif
 
 
-SDL_Window *get_window();
 unsigned int get_total_width();
 unsigned int get_total_height();
 

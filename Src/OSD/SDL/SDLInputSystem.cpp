@@ -453,7 +453,6 @@ bool CSDLInputSystem::InitializeSystem()
   std::cout << "Found " << available_mice << " available mice"  << std::endl;
   std::cout << std::endl;
 
-  SDL_SetWindowGrab(get_window(), SDL_TRUE);
 #endif
 
   return true;

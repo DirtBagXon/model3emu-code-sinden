@@ -96,8 +96,6 @@ static Util::Config::Node s_runtime_config("Global");
 
 SDL_Window *s_window = nullptr;
 
-SDL_Window *get_window() { return s_window; }
-
 /*
  * Position and size of rectangular region within OpenGL display to render to.
  * Unlike the config tree, these end up containing the actual resolution (and
@@ -940,8 +938,12 @@ int Supermodel(const Game &game, ROMSet *rom_set, IEmulator *Model3, CInputs *In
   gameHasLightguns = !!(game.inputs & (Game::INPUT_GUN1|Game::INPUT_GUN2));
   gameHasLightguns |= game.name == "lostwsga";
   currentInputs = game.inputs;
-  if (gameHasLightguns || s_runtime_config["Borders"].ValueAs<unsigned>())
+  if (gameHasLightguns || s_runtime_config["Borders"].ValueAs<unsigned>()) {
+#ifdef SUPERMODEL_MANYMOUSE
+      if (s_window) SDL_SetWindowGrab(s_window, SDL_TRUE);
+#endif
       videoInputs = Inputs;
+  }
   else
       videoInputs = NULL;
 
