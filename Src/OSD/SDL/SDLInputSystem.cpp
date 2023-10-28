@@ -452,7 +452,6 @@ bool CSDLInputSystem::InitializeSystem()
 
   std::cout << "Found " << available_mice << " available mice"  << std::endl;
   std::cout << std::endl;
-
 #endif
 
   return true;
