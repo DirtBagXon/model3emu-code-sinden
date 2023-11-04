@@ -147,6 +147,7 @@ struct Mesh
 	bool highPriority	= false;		// rendered over the top
 	bool transLSelect	= false;		// actually the transparency layer, false = layer 0, true = layer 1
 	bool translatorMap	= false;		// colours are multiplied by 16
+	bool noLosReturn	= false;		// line of sight test
 
 	// lighting
 	bool fixedShading	= false;
@@ -242,6 +243,7 @@ public:
 	Clip currentClipStatus;
 	float currentModelScale;
 	float currentModelAlpha;
+	bool currentDisableCulling;
 
 private:
 
@@ -253,6 +255,7 @@ private:
 		Clip clip;
 		float modelScale;
 		float modelAlpha;	// from culling node
+		bool disableCulling;
 	};
 	std::vector<NodeAttribs> m_vecAttribs;
 };

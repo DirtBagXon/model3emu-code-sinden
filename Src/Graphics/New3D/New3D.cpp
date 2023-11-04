@@ -324,8 +324,8 @@ void CNew3D::SetRenderStates()
 	glActiveTexture	(GL_TEXTURE0);
 	glDisable		(GL_CULL_FACE);					// we'll emulate this in the shader		
 
-	glStencilFunc	(GL_EQUAL, 0, 0xFF);			// basically stencil test passes if the value is zero
-	glStencilOp		(GL_KEEP, GL_INCR, GL_INCR);	// if the stencil test passes, we increment the value
+	glEnable		(GL_STENCIL_TEST);
+	glStencilOp		(GL_KEEP, GL_KEEP, GL_REPLACE);
 	glStencilMask	(0xFF);
 
 	glBlendFunc		(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -559,9 +559,12 @@ bool CNew3D::DrawModel(UINT32 modelAddr)
 			-------- -------- -------- -----x--	Valid color table
 			-------- -------- -------- ------xx	Node type(0 = viewport, 1 = root node, 2 = culling node)
 
-	0x01, 0x02 only present on Step 2 +
+	0x01, 0x02 only present on Step 1.5+
 
-	0x01:   xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx	Model scale(float)
+	0x01:   xxxxxxxx xxxxxxxx xxxxxxxx xxxxxx--	Model scale (float32) last 2 bits are control words
+			-------- -------- -------- ------x- Disable culling
+			-------- -------- -------- -------x	Valid model scale
+
 	0x02 :	-------- -------- x------- --------	Texture replace
 			-------- -------- -x------ --------	Switch bank
 			-------- -------- --xxxxxx x-------	X offset
@@ -570,13 +573,30 @@ bool CNew3D::DrawModel(UINT32 modelAddr)
 	0x03 :	xxxxxxxx xxxxx--- -------- --------	Color table address 1
 			-------- -----xxx xxxx---- --------	LOD table pointer
 			-------- -------- ----xxxx xxxxxxxx	Node matrix
+
+	0x04:   Translation X coordinate
+	0x05:   Translation Y coordinate
+	0x06:   Translation Z coordinate
+
+	0x07:   xxxx---- -------- -------- -------- Color table address 2
+			-----x-- -------- -------- -------- Sibling table
+			------x- -------- -------- -------- Point
+			-------x -------- -------- -------- Leaf node
+			-------- xxxxxxxx xxxxxxxx xxxxxxxx Child pointer
+
+	0x08:   xxxxxxx- -------- -------- -------- Color table address 3
+			-------x -------- -------- -------- Null sibling
+			-------- xxxxxxxx xxxxxxxx xxxxxxxx Sibling pointer
+
+	0x09:   xxxxxxxx xxxxxxxx -------- -------- Blend radius
+			-------- -------- xxxxxxxx xxxxxxxx Culling radius
 */
 
 void CNew3D::DescendCullingNode(UINT32 addr)
 {
 	enum class NodeType { undefined = -1, viewport = 0, rootNode = 1, cullingNode = 2 };
 
-	const UINT32	*node, *lodTable;
+	const UINT32	*node, *lodPtr;
 	UINT32			matrixOffset, child1Ptr, sibling2Ptr;
 	BBox			bbox;
 	UINT16			uCullRadius;
@@ -626,10 +646,11 @@ void CNew3D::DescendCullingNode(UINT32 addr)
 
 	if (!m_offset) {		// Step 1.5+
 
-		float modelScale = Util::Uint32AsFloat(node[1]);
-		if (modelScale > std::numeric_limits<float>::min()) {
-			m_nodeAttribs.currentModelScale = modelScale;
-		}
+		if (node[0x01] & 1)
+			m_nodeAttribs.currentModelScale = Util::Uint32AsFloat(node[0x01] & ~3);	// mask out control bits
+
+		if (node[0x01] & 2)
+			m_nodeAttribs.currentDisableCulling = true;
 
 		// apply texture offsets, else retain current ones
 		if ((node[0x02] & 0x8000))	{
@@ -640,8 +661,6 @@ void CNew3D::DescendCullingNode(UINT32 addr)
 			m_nodeAttribs.currentPage = (node[0x02] & 0x4000) >> 14;
 		}
 	}
-
-	m_nodeAttribs.currentModelAlpha = 1;	// TODO fade out if required
 
 	// Apply matrix and translation
 	m_modelMat.PushMatrix();
@@ -686,19 +705,42 @@ void CNew3D::DescendCullingNode(UINT32 addr)
 		}
 	}
 
-	if (m_nodeAttribs.currentClipStatus != Clip::OUTSIDE && fCullRadius > R3DFloat::Pro16BitFltMin) {
+	float LODscale = fBlendRadius * m_nodeAttribs.currentModelScale / std::abs(m_modelMat.currentMatrix[14]);
+
+	LODFeatureType lodTableEntry = m_LODBlendTable->table[lodTablePointer];
+
+	if (m_nodeAttribs.currentDisableCulling)
+	{
+		m_nodeAttribs.currentModelAlpha = 1.0f;
+	}
+	else
+	{
+		float nodeAlpha = lodTableEntry.lod[3].blendFactor * (LODscale - lodTableEntry.lod[3].deleteSize);
+		nodeAlpha = std::clamp(nodeAlpha, 0.0f, 1.0f);
+		m_nodeAttribs.currentModelAlpha *= nodeAlpha;	// alpha of each node multiples by the alpha of its parent
+	}
+
+	if (m_nodeAttribs.currentClipStatus != Clip::OUTSIDE && m_nodeAttribs.currentModelAlpha > 0.0f) {
 
 		// Descend down first link
 		if ((node[0x00] & 0x08))	// 4-element LOD table
 		{
-			lodTable = TranslateCullingAddress(child1Ptr);
+			lodPtr = TranslateCullingAddress(child1Ptr);
 
-			if (NULL != lodTable) {
+			// determine which LOD to use; we do not currently blend between LODs
+			int modelLOD;
+			for (modelLOD = 0; modelLOD < 3; modelLOD++)
+			{
+				if (LODscale >= lodTableEntry.lod[modelLOD].deleteSize)
+					break;
+			}
+
+			if (NULL != lodPtr) {
 				if ((node[0x03 - m_offset] & 0x20000000)) {
-					DescendCullingNode(lodTable[0] & 0xFFFFFF);
+					DescendCullingNode(lodPtr[modelLOD] & 0xFFFFFF);
 				}
 				else {
-					DrawModel(lodTable[0] & 0xFFFFFF);	//TODO
+					DrawModel(lodPtr[modelLOD] & 0xFFFFFF);
 				}
 			}
 		}
@@ -1141,6 +1183,7 @@ void CNew3D::SetMeshValues(SortingMesh *currentMesh, PolyHeader &ph)
 	currentMesh->specularValue	= ph.SpecularValue();
 	currentMesh->fogIntensity	= ph.LightModifier();
 	currentMesh->translatorMap	= ph.TranslatorMap();
+	currentMesh->noLosReturn	= ph.NoLosReturn();
 
 	if (currentMesh->textured) {
 
@@ -1808,17 +1851,32 @@ bool CNew3D::ProcessLos(int priority)
 				float depth;
 				glReadPixels(losX, losY, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &depth);
 
-				if (depth < 0.99f || depth == 1.0f) {		// kinda guess work but when depth = 1, haven't drawn anything, when 0.99~ drawing sky somewhere far
-					return false;
-				}
-
 				depth = 2.0f * depth - 1.0f;
 
 				float zNear = m_nfPairs[priority].zNear;
 				float zFar	= m_nfPairs[priority].zFar;
 				float zVal	= 2.0f * zNear * zFar / (zFar + zNear - depth * (zFar - zNear));
 
+				// real3d test program indicates that return values are 1/zVal
+				zVal = 1.0f / zVal;
+
+				GLubyte stencilVal;
+				glReadPixels(losX, losY, 1, 1, GL_STENCIL_INDEX, GL_UNSIGNED_BYTE, &stencilVal);
+
+				// if the stencil val is zero that means we've hit sky or whatever, if it hits a 1 we've hit geometry
+				// the real3d returns 1 in the top bit of the float if the line of sight test passes (ie doesn't hit geometry)
+
+				auto zValP = reinterpret_cast<unsigned char*>(&zVal);	// this is legal in c++, casting to int technically isn't
+
+				if (stencilVal == 0) {
+					zValP[0] |= 1;		// set first bit to 1
+				}
+				else {
+					zValP[0] &= 0xFE;	// set first bit to zero
+				}
+
 				m_losBack->value[priority] = zVal;
+
 				return true;
 			}
 		}
