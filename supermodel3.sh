@@ -29,7 +29,7 @@ function sources_supermodel3() {
 function build_supermodel3() {
     cp Makefiles/Makefile.UNIX Makefile
     make clean
-    make
+    make NET_BOARD=1
     cp Docs/LICENSE.txt LICENSE
     cp bin/supermodel supermodel3
     md_ret_require="supermodel3"

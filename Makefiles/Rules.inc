@@ -226,20 +226,12 @@ all:	$(BIN_DIR)/$(OUTFILE)
 # version number. Double-colon rules should force ordered execution.
 # The automated build script relies on these -- don't modify their output!
 #
-.PHONY: set_version
 .PHONY: print_message
-.PHONY: version
-release:: set_version
 release:: print_message
 release:: clean
 release:: all
-set_version:
-	$(eval VERSION = $(strip $(subst ',,0.3a-git-$(shell git rev-parse --short HEAD --sq))))
-	$(eval SUPERMODEL_BUILD_FLAGS += -DSUPERMODEL_VERSION=\"$(VERSION)\")
 print_message:
-	$(info Building Supermodel Version $(VERSION))
-version: set_version
-	@echo $(VERSION)
+	$(info Building Supermodel)
 
 $(BIN_DIR)/$(OUTFILE):	$(BIN_DIR) $(OBJ_DIR) $(OBJ_FILES)
 	$(info --------------------------------------------------------------------------------)
