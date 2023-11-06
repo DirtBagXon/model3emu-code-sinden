@@ -1,0 +1,45 @@
+
+======================================================
+ Unofficial fork of the official Supermodel repository
+======================================================
+
+Supermodel: Sega Model 3 Emulator (Sinden)
+
+This is a fork of model3emu-code to add native Sinden light gun support.
+
+It uses ManyMouse to provide 2 player gun support in Linux and MacOSX.
+
+It will attempt to track the main git repo commits.
+
+Compilation versions will follow the official repo commit SHORT SHA.
+
+
+=====================
+Additional arguments:
+=====================
+
+-sinden=<n>       Sinden border configuration for gun games:
+                  0=none [Default], 1=standard, 2=wide
+-nomousecursor    Disable desktop mouse cursor in SDL Windowed mode
+
+
+===========
+Compilation
+===========
+
+Compile FLAGS:
+
+Compile Linux/MacOSX with Makefile FLAG:
+
+       INPUT_CFLAGS = -DSUPERMODEL_MANYMOUSE
+
+
+Linux/MacOSX:
+
+      Update Supermodel.ini singular MOUSE_ definitions to MOUSEx_ index
+      definitions.
+
+
+MacOSX launcher:
+
+      Possibly Terminal, will require "Input Monitoring" permissions.

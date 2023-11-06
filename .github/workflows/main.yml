@@ -84,11 +84,11 @@ jobs:
       - name: Package
         run: |
           mkdir NVRAM Saves ROMs
-          cp Docs/LICENSE.txt Docs/README.txt .
+          cp Docs/LICENSE.txt Docs/README.txt Docs/FORKINFO.txt .
           echo "NMRAM files go here." > NVRAM/DIR.txt
           echo "Save states go here." > Saves/DIR.txt
           echo "Recommended (but not mandatory) location for ROM sets." > ROMs/DIR.txt
-          FILES="supermodel${{ matrix.outfile_ext }} LICENSE.txt README.txt Config/ Assets/ NVRAM/ Saves/ ROMs/ ${{ matrix.archive_files }}"
+          FILES="supermodel${{ matrix.outfile_ext }} LICENSE.txt README.txt FORKINFO.txt Config/ Assets/ NVRAM/ Saves/ ROMs/ ${{ matrix.archive_files }}"
           if [[ "${{ matrix.archive }}" == "tar" ]] ; then
             tar -cvf supermodel-${{ env.COMMIT_SHORT_SHA }}.tar $FILES
           elif [[ "${{ matrix.archive }}" == "zip" ]] ; then
