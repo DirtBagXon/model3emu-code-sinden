@@ -11,7 +11,7 @@ It uses ManyMouse to provide 2 player gun support in Linux and MacOSX.
 
 It will attempt to track the main git repo commits.
 
-Compilation versions will follow the official repo commit SHORT SHA.
+Compiled versions will follow the official repo commit SHORT SHA tag.
 
 
 =====================
@@ -20,19 +20,13 @@ Additional arguments:
 
 -sinden=<n>       Sinden border configuration for gun games:
                   0=none [Default], 1=standard, 2=wide
+
 -nomousecursor    Disable desktop mouse cursor in SDL Windowed mode
 
 
-===========
-Compilation
-===========
-
-Compile FLAGS:
-
-Compile Linux/MacOSX with Makefile FLAG:
-
-       INPUT_CFLAGS = -DSUPERMODEL_MANYMOUSE
-
+=============
+Configuration
+=============
 
 Linux/MacOSX:
 
@@ -43,3 +37,14 @@ Linux/MacOSX:
 MacOSX launcher:
 
       Possibly Terminal, will require "Input Monitoring" permissions.
+
+
+===========
+Compilation
+===========
+
+Compile Linux/MacOSX with Makefile FLAG:
+
+       INPUT_CFLAGS = -DSUPERMODEL_MANYMOUSE
+
+
