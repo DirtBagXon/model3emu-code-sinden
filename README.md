@@ -5,7 +5,9 @@ This is a fork of [model3emu-code](https://www.supermodel3.com) to add native **
 
 This fork uses [ManyMouse](https://github.com/icculus/manymouse) to provide 2 player gun support in Linux and MacOSX.
 
-It will attempt to track the main git repo commits.
+Two player mouse input in Windows is currently unchanged (supported in the official release) via the Windows Raw Input system.
+
+This repo will attempt to track the official git repo commits.
 
 Additional arguments:
 
