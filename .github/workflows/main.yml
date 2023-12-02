@@ -29,11 +29,11 @@ jobs:
           - os: ubuntu-latest
             makefile: Makefile.UNIX
             shell: bash
-            archive: tar
+            archive: tgz
           - os: macos-latest
             makefile: Makefile.OSX
             shell: bash
-            archive: tar
+            archive: tgz
             archive_files: Frameworks/
     runs-on: ${{ matrix.os }}
     defaults:
@@ -90,8 +90,8 @@ jobs:
           echo "Graphics Analysis go here." > GraphicsAnalysis/DIR.txt
           echo "Recommended (but not mandatory) location for ROM sets." > ROMs/DIR.txt
           FILES="supermodel${{ matrix.outfile_ext }} LICENSE.txt README.txt FORKINFO.txt Config/ Assets/ NVRAM/ Saves/ ROMs/ GraphicsAnalysis/ ${{ matrix.archive_files }}"
-          if [[ "${{ matrix.archive }}" == "tar" ]] ; then
-            tar -cvf supermodel-${{ env.COMMIT_SHORT_SHA }}.tar $FILES
+          if [[ "${{ matrix.archive }}" == "tgz" ]] ; then
+            tar -zcvf supermodel-${{ env.COMMIT_SHORT_SHA }}.tgz $FILES
           elif [[ "${{ matrix.archive }}" == "zip" ]] ; then
             zip -r supermodel-${{ env.COMMIT_SHORT_SHA }}.zip $FILES
           fi
@@ -99,3 +99,46 @@ jobs:
         with:
           name: supermodel-${{ runner.os }}-${{ runner.arch }}
           path: supermodel-${{ env.COMMIT_SHORT_SHA }}.${{ matrix.archive }}
+
+  release:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@master
+      - name: Retrieve hash
+        id: vars
+        run: |
+          ShortSHA=$(git rev-parse --short ${{ github.sha }})
+          echo "COMMIT_SHORT_SHA=$ShortSHA" >> $GITHUB_ENV
+      - name: Download Linux Artifact
+        uses: actions/download-artifact@master
+        with:
+          name: supermodel-Linux-X64
+          path: artifacts
+      - name: Rename
+        run: mv artifacts/supermodel-${{ env.COMMIT_SHORT_SHA }}.tgz artifacts/supermodel-Linux-${{ github.event.head_commit.message }}.tgz
+      - name: Download Mac Artifact
+        uses: actions/download-artifact@master
+        with:
+          name: supermodel-macOS-X64
+          path: artifacts
+      - name: Rename
+        run: mv artifacts/supermodel-${{ env.COMMIT_SHORT_SHA }}.tgz artifacts/supermodel-macOS-${{ github.event.head_commit.message }}.tgz
+      - name: Download Windows Artifact
+        uses: actions/download-artifact@master
+        with:
+          name: supermodel-Windows-X64
+          path: artifacts
+      - name: Rename
+        run: mv artifacts/supermodel-${{ env.COMMIT_SHORT_SHA }}.zip artifacts/supermodel-Windows-${{ github.event.head_commit.message }}.zip
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        env:
+           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ env.COMMIT_SHORT_SHA }}
+          name: ${{ github.event.head_commit.message }}-dbx
+          draft: false
+          prerelease: false
+          files: artifacts/*
