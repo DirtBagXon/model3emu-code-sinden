@@ -1327,8 +1327,8 @@ int Supermodel(const Game &game, ROMSet *rom_set, IEmulator *Model3, CInputs *In
       if (measurementTicks >= s_perfCounterFrequency) // update FPS every 1 second (s_perfCounterFrequency is how many perf ticks in one second)
       {
         float fps = float(fpsFramesElapsed) / (float(measurementTicks) / float(s_perfCounterFrequency));
-        sprintf(titleStr, "%s - %1.3f FPS%s", baseTitleStr, fps, paused ? " (Paused)" : "");
-        SDL_SetWindowTitle(s_window, titleStr);
+        sprintf(titleStr, "- Framerate: %1.3f FPS%s", fps, paused ? " (Paused)" : "");
+        std::cout << titleStr << std::endl;
         prevFPSTicks = currentFPSTicks;   // reset tick count
         fpsFramesElapsed = 0;             // reset frame count
       }
