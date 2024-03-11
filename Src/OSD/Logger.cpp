@@ -168,7 +168,10 @@ void CMultiLogger::DebugLog(const char *fmt, va_list vl)
 {
   for (auto &logger: m_loggers)
   {
-    logger->DebugLog(fmt, vl);
+    va_list vl_tmp;
+    va_copy(vl_tmp, vl);
+    logger->DebugLog(fmt, vl_tmp);
+    va_end(vl_tmp);
   }
 }
 
@@ -176,7 +179,10 @@ void CMultiLogger::InfoLog(const char *fmt, va_list vl)
 {
   for (auto &logger: m_loggers)
   {
-    logger->InfoLog(fmt, vl);
+    va_list vl_tmp;
+    va_copy(vl_tmp, vl);
+    logger->InfoLog(fmt, vl_tmp);
+    va_end(vl_tmp);
   }
 }
 
@@ -184,7 +190,10 @@ void CMultiLogger::ErrorLog(const char *fmt, va_list vl)
 {
   for (auto &logger: m_loggers)
   {
-    logger->ErrorLog(fmt, vl);
+    va_list vl_tmp;
+    va_copy(vl_tmp, vl);
+    logger->ErrorLog(fmt, vl_tmp);
+    va_end(vl_tmp);
   }
 }
 
@@ -212,10 +221,11 @@ void CConsoleErrorLogger::InfoLog(const char *fmt, va_list vl)
 void CConsoleErrorLogger::ErrorLog(const char *fmt, va_list vl)
 {
   char  string[4096];
-  va_list vlCopy;
-  va_copy(vlCopy, vl);
-  vsprintf(string, fmt, vlCopy);
+  va_list vl_tmp;
+  va_copy(vl_tmp, vl);
+  vsprintf(string, fmt, vl_tmp);
   fprintf(stderr, "Error: %s\n", string);
+  va_end(vl_tmp);
 }
 
 /*
