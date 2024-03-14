@@ -181,7 +181,7 @@ void CMultiLogger::InfoLog(const char *fmt, va_list vl)
   {
     va_list vl_tmp;
     va_copy(vl_tmp, vl);
-    logger->DebugLog(fmt, vl_tmp);
+    logger->InfoLog(fmt, vl_tmp);
     va_end(vl_tmp);
   }
 }
@@ -192,7 +192,7 @@ void CMultiLogger::ErrorLog(const char *fmt, va_list vl)
   {
     va_list vl_tmp;
     va_copy(vl_tmp, vl);
-    logger->DebugLog(fmt, vl_tmp);
+    logger->ErrorLog(fmt, vl_tmp);
     va_end(vl_tmp);
   }
 }
