@@ -59,11 +59,15 @@ public:
   // Log level in ascending order
   enum LogLevel: int
   {
-    All = 0,
-    Debug,
-    Info,
-    Error
+   All = 0,
+   Debug,
+   Info,
+   Error
   };
+
+  virtual ~CLogger()
+    {
+    }
 
 	/*
 	 * DebugLog(fmt, ...):
