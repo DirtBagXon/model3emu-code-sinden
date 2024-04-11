@@ -239,7 +239,8 @@ static bool CreateGLScreen(const std::string &caption, bool focusWindow, unsigne
 
   // Initialize GLEW, allowing us to use features beyond OpenGL 1.2
   err = glewInit();
-  if (GLEW_OK != err)
+  // Ignore not required GLX error
+  if (GLEW_OK != err && GLEW_ERROR_NO_GLX_DISPLAY != err)
   {
     ErrorLog("OpenGL initialization failed: %s\n", glewGetErrorString(err));
     return FAIL;
