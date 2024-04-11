@@ -1501,7 +1501,7 @@ static Util::Config::Node DefaultConfig()
   // CDriveBoard
   config.Set("ForceFeedback", false);
   // Platform-specific/UI
-  config.Set("New3DEngine", true);
+  config.Set("New3DEngine", false);
   config.Set("QuadRendering", false);
   config.Set("XResolution", "496");
   config.Set("YResolution", "384");
