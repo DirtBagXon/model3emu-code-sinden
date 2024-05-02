@@ -49,7 +49,7 @@ jobs:
       - name: Install macos build dependencies
         if: startsWith(matrix.os, 'macos')
         run: |
-          curl -sLo SDL2.dmg https://github.com/libsdl-org/SDL/releases/download/release-2.28.5/SDL2-2.28.5.dmg
+          curl -sLo SDL2.dmg https://github.com/libsdl-org/SDL/releases/download/release-2.30.2/SDL2-2.30.2.dmg
           curl -sLo SDL2_net.dmg https://github.com/libsdl-org/SDL_net/releases/download/release-2.2.0/SDL2_net-2.2.0.dmg
           hdiutil attach -quiet SDL2.dmg
           hdiutil attach -quiet SDL2_net.dmg
@@ -85,7 +85,7 @@ jobs:
         run: |
           mkdir NVRAM Saves ROMs GraphicsAnalysis
           cp Docs/LICENSE.txt Docs/README.txt Docs/FORKINFO.txt .
-          echo "NMRAM files go here." > NVRAM/DIR.txt
+          echo "NVRAM files go here." > NVRAM/DIR.txt
           echo "Save states go here." > Saves/DIR.txt
           echo "Graphics Analysis go here." > GraphicsAnalysis/DIR.txt
           echo "Recommended (but not mandatory) location for ROM sets." > ROMs/DIR.txt
@@ -121,7 +121,7 @@ jobs:
       - name: Download Mac Artifact
         uses: actions/download-artifact@master
         with:
-          name: supermodel-macOS-X64
+          name: supermodel-macOS-ARM64
           path: artifacts
       - name: Rename
         run: mv artifacts/supermodel-${{ env.COMMIT_SHORT_SHA }}.tgz artifacts/supermodel-macOS-${{ github.event.head_commit.message }}.tgz
@@ -133,7 +133,7 @@ jobs:
       - name: Rename
         run: mv artifacts/supermodel-${{ env.COMMIT_SHORT_SHA }}.zip artifacts/supermodel-Windows-${{ github.event.head_commit.message }}.zip
       - name: Create Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         env:
            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
