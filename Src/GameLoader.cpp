@@ -898,6 +898,13 @@ bool GameLoader::Load(Game *game, ROMSet *rom_set, const std::string &zipfilenam
   if (chosen_game.empty())
     return true;
 
+  auto it = m_game_info_by_game.find(chosen_game);
+  if (it == m_game_info_by_game.end())
+  {
+    ErrorLog("Cannot load unknown game '%s'. Is it defined in '%s'?", chosen_game.c_str(), m_xml_filename.c_str());
+    return true;
+  }
+
   // Return game information to caller
   *game = m_game_info_by_game.find(chosen_game)->second;
 
