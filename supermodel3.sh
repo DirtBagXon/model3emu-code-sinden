@@ -20,6 +20,7 @@ rp_module_flags="sdl2"
 function depends_supermodel3() {
 
     getDepends xinit libsdl2-dev libsdl2-net-dev libsdl2-net-2.0-0 x11-xserver-utils xserver-xorg
+
     aptRemove xserver-xorg-legacy
 
     if [[ "$__os_debian_ver" -eq 12 ]]; then
@@ -51,10 +52,8 @@ function install_supermodel3() {
 function configure_supermodel3() {
 
     mkRomDir "arcade"
-
-    local allemu="/opt/retropie/configs/all/emulators.cfg"
-
-    addEmulator 0 "$md_id" "arcade" "XINIT:$md_inst/$md_id -borders=2 %ROM%"
+    
+    addEmulator 0 "$md_id" "arcade" "XINIT:$md_inst/supermodel3.sh %ROM%"
     addSystem "arcade"
 
     [[ "$md_mode" == "remove" ]] && return
@@ -74,14 +73,19 @@ function configure_supermodel3() {
     copyDefaultConfig "$md_inst/Config/Supermodel.ini" "$md_conf_root/$md_id/Supermodel.ini"
     copyDefaultConfig "$md_inst/Config/Games.xml" "$md_conf_root/$md_id/Games.xml"
 
-    local rom
-    for rom in lostwsga lamachin oceanhun swtrilgy; do
-          if ! grep -q "arcade_$rom" "$allemu"; then
-             addLineToFile "arcade_$rom = \"$md_id\"" $allemu
-          fi
-    done
-
     rm -rf "$md_inst/Config"
     chown -R $user:$user "$md_inst"
     chown -R $user:$user "$md_conf_root/$md_id"
+
+    cat >"$md_inst/supermodel3.sh" <<_EOF_
+#!/bin/bash
+commands="\${1%.*}.commands"
+
+if [[ -f "\$commands" ]]; then
+	params=\$(<"\$commands" tr -d '\r' | tr '\n' ' ')
+fi
+
+$md_inst/supermodel3 \$params \$1
+_EOF_
+    chmod +x "$md_inst/supermodel3.sh"
 }
