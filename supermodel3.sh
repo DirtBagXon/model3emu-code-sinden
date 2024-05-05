@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+el#!/usr/bin/env bash
  
 # This file is part of The RetroPie Project
 #
@@ -75,27 +75,19 @@ function configure_supermodel3() {
     copyDefaultConfig "$md_inst/Config/Supermodel.ini" "$md_conf_root/$md_id/Supermodel.ini"
     copyDefaultConfig "$md_inst/Config/Games.xml" "$md_conf_root/$md_id/Games.xml"
 
-    local rom
-    for rom in lostwsga lamachin oceanhun swtrilgy; do
-          if ! grep -q "arcade_$rom" "$allemu"; then
-             addLineToFile "arcade_$rom = \"$md_id\"" $allemu
-          fi
-    done
-
     rm -rf "$md_inst/Config"
     chown -R $user:$user "$md_inst"
     chown -R $user:$user "$md_conf_root/$md_id"
 
-    cat >"$md_inst/hypseus.sh" <<_EOF_
+    cat >"$md_inst/supermodel3.sh" <<_EOF_
 #!/bin/bash
-commands="${1%.*}.commands"
+commands="\${1%.*}.commands"
 
-if [[ -f "$commands" ]]; then
-    #params=$(<"$commands")
-	params=$(<"$commands" tr -d '\r' | tr '\n' ' ')
+if [[ -f "\$commands" ]]; then
+	params=\$(<"\$commands" tr -d '\r' | tr '\n' ' ')
 fi
 
-$md_inst/supermodel3 $params $1
+$md_inst/supermodel3 \$params \$1
 _EOF_
     chmod +x "$md_inst/supermodel3.sh"
 }
