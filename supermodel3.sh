@@ -55,7 +55,7 @@ function configure_supermodel3() {
 
     local allemu="/opt/retropie/configs/all/emulators.cfg"
 
-    addEmulator 0 "$md_id" "arcade" "XINIT:$md_inst/$md_id -borders=2 %ROM%"
+    addEmulator 0 "$md_id" "arcade" "XINIT:$md_inst/supermodel3.sh %ROM%"
     addSystem "arcade"
 
     [[ "$md_mode" == "remove" ]] && return
@@ -85,4 +85,17 @@ function configure_supermodel3() {
     rm -rf "$md_inst/Config"
     chown -R $user:$user "$md_inst"
     chown -R $user:$user "$md_conf_root/$md_id"
+
+    cat >"$md_inst/hypseus.sh" <<_EOF_
+#!/bin/bash
+commands="${1%.*}.commands"
+
+if [[ -f "$commands" ]]; then
+    #params=$(<"$commands")
+	params=$(<"$commands" tr -d '\r' | tr '\n' ' ')
+fi
+
+$md_inst/supermodel3 $params $1
+_EOF_
+    chmod +x "$md_inst/supermodel3.sh"
 }
