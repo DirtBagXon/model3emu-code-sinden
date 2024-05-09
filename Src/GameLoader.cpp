@@ -879,23 +879,23 @@ bool GameLoader::Load(Game *game, ROMSet *rom_set, const std::string &zipfilenam
   if (LoadZipArchive(&zip, zipfilename))
     return true;
 
-  std::string parent = zipfilename;
-  size_t pos = parent.find_last_of("/\\");
-  parent = parent.substr(pos + 1);
-  parent.erase(parent.size() - 4);
+  size_t pos = zipfilename.find_last_of("/\\") + 1;
+  std::string parent = zipfilename.substr(pos, (zipfilename.size() - pos) - 4);
+
+  auto it = m_game_info_by_game.find(parent);
+  if (it == m_game_info_by_game.end())
+  {
+    ErrorLog("No game called '%s'. Please use an appropriately named zip.", parent.c_str());
+    return true;
+  }
 
   // Pick the game to load (there could be multiple ROM sets in a zip file)
   std::string chosen_game = game_name;
   bool missing_parent_roms = false;
 
-  if (game_name.empty() || game_name == parent) {
+  if (game_name.empty() || game_name == parent)
+  {
     chosen_game = parent;
-    auto it = m_game_info_by_game.find(chosen_game);
-    if (it == m_game_info_by_game.end())
-    {
-      ErrorLog("Cannot load unknown game '%s'. Is it defined in '%s'?", chosen_game.c_str(), m_xml_filename.c_str());
-      return true;
-    }
     missing_parent_roms = true;
   }
   else

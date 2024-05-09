@@ -5,6 +5,8 @@ This is a fork of [model3emu-code](https://www.supermodel3.com) to add native **
 
 This fork uses [ManyMouse](https://github.com/icculus/manymouse) to provide 2 player gun support in Linux.
 
+Better support for MAME style multi ROM sets has also been added.
+
 It will attempt to track the main git repo commits.
 
 ### RetroPie package
