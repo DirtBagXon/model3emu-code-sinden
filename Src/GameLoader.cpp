@@ -880,12 +880,12 @@ bool GameLoader::Load(Game *game, ROMSet *rom_set, const std::string &zipfilenam
     return true;
 
   size_t pos = zipfilename.find_last_of("/\\") + 1;
-  std::string parent = zipfilename.substr(pos, (zipfilename.size() - pos) - 4);
+  std::string loading = zipfilename.substr(pos, (zipfilename.size() - pos) - 4);
 
-  auto it = m_game_info_by_game.find(parent);
+  auto it = m_game_info_by_game.find(loading);
   if (it == m_game_info_by_game.end())
   {
-    ErrorLog("No game called '%s'. Please use an appropriately named zip.", parent.c_str());
+    ErrorLog("No game called '%s'. Please use an appropriately named zip.", loading.c_str());
     return true;
   }
 
@@ -893,9 +893,9 @@ bool GameLoader::Load(Game *game, ROMSet *rom_set, const std::string &zipfilenam
   std::string chosen_game = game_name;
   bool missing_parent_roms = false;
 
-  if (game_name.empty() || game_name == parent)
+  if (game_name.empty() || game_name == loading)
   {
-    chosen_game = parent;
+    chosen_game = loading;
     missing_parent_roms = true;
   }
   else
@@ -907,7 +907,7 @@ bool GameLoader::Load(Game *game, ROMSet *rom_set, const std::string &zipfilenam
   // Return game information to caller
   *game = m_game_info_by_game.find(chosen_game)->second;
 
-  if (game->parent.empty()) game->parent = parent;
+  if (game->parent.empty()) game->parent = loading;
 
   // Bring in additional parent ROM set if needed
   if (missing_parent_roms)

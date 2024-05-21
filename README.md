@@ -1,5 +1,5 @@
 # Supermodel: Sega Model 3 Emulator (Sinden)
-*Copyright 2003-2022 The Supermodel Team*
+*Copyright 2003-2024 The Supermodel Team*
 
 This is a fork of [model3emu-code](https://www.supermodel3.com) to add native **Sinden** light gun support.
 
