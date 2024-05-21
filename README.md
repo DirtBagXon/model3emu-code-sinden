@@ -1,5 +1,5 @@
 # Supermodel: Sega Model 3 Emulator (Sinden)
-*Copyright 2003-2023 The Supermodel Team*
+*Copyright 2003-2024 The Supermodel Team*
 
 This is a fork of [model3emu-code](https://www.supermodel3.com) to add native **Sinden** light gun support.
 
@@ -8,10 +8,13 @@ This fork uses [ManyMouse](https://github.com/icculus/manymouse) to provide 2 pl
 Two player mouse input in Windows is currently unchanged _(supported in the official release)_ via  
 the Windows Raw Input system. A Windows package is provided for Sinden border support.
 
+Better support for MAME style multi ROM sets has also been added.
+
 This repo will attempt to track the official git repo commits.
 
 Additional arguments:
 
+    -game=<name>      Specific game to start in multi-romset
     -sinden=<n>       Sinden border configuration for gun games:
                       0=none [Default], 1=standard, 2=wide
     -nomousecursor    Disable desktop mouse cursor in SDL Windowed mode
