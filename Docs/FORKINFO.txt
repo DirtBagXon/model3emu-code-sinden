@@ -18,6 +18,8 @@ Compiled versions will follow the official repo commit SHORT SHA tag.
 Additional arguments:
 =====================
 
+-game=<name>      Specific game to start in multi-romset
+
 -sinden=<n>       Sinden border configuration for gun games:
                   0=none [Default], 1=standard, 2=wide
 
