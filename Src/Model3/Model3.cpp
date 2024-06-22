@@ -3013,6 +3013,7 @@ bool CModel3::LoadGame(const Game &game, const ROMSet &rom_set)
 
   // Print game information
   std::set<std::string> extra_hw;
+  std::string engine_type = (m_config["New3DEngine"].ValueAs<bool>() ? "New" : "Legacy");
 
   if (DSB)
     extra_hw.insert(Util::Format() << "Digital Sound Board (Type " << game.mpeg_board << ")");
@@ -3035,6 +3036,7 @@ bool CModel3::LoadGame(const Game &game, const ROMSet &rom_set)
   std::cout << "    Developer:      " << game.manufacturer << std::endl;
   std::cout << "    Year:           " << game.year << std::endl;
   std::cout << "    Stepping:       " << game.stepping << std::endl;
+  std::cout << "    3D Engine:      " << engine_type << std::endl;
   if (!extra_hw.empty())
     std::cout << "    Extra Hardware: " << Util::Format(", ").Join(extra_hw) << std::endl;
   std::cout << std::endl;
