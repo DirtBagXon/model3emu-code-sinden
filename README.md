@@ -10,11 +10,8 @@ Better support for MAME style multi ROM sets has also been added.
 It will attempt to track the main git repo commits.
 
 ### RetroPie package
-Use `supermodel3.sh` for _RetroPie-Setup_
 
-    wget https://raw.githubusercontent.com/DirtBagXon/model3emu-code-sinden/main/supermodel3.sh -O $HOME/RetroPie-Setup/scriptmodules/emulators/supermodel3.sh
-
-    sudo $HOME/RetroPie-Setup/retropie_setup.sh
+`supermodel3` is now available in RetroPie-Setup (_exp_) packages.
 
 ### Additional arguments:
 
