@@ -12,7 +12,7 @@ Better support for MAME style multi ROM sets has also been added.
 
 This repo will attempt to track the official git repo commits.
 
-Additional arguments:
+### Additional arguments:
 
     -game=<name>      Specific game to start in multi-romset
     -sinden=<n>       Sinden border configuration for gun games:
