@@ -2099,8 +2099,8 @@ void CModel3::RunMainBoardFrame(void)
 
 			// Process MIDI interrupt
 			IRQ.Assert(0x40);
-			ppc_execute(400); // give PowerPC time to acknowledge IR
-			dispCycles -= 400;
+			ppc_execute(500); // give PowerPC time to acknowledge IR
+			dispCycles -= 500;
 
 			++irqCount;
 			if (irqCount > 128)
