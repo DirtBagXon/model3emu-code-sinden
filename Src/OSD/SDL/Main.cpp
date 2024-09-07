@@ -1044,15 +1044,15 @@ int Supermodel(const Game &game, ROMSet *rom_set, IEmulator *Model3, CInputs *In
 #endif
   while (!quit)
   {
+    // Poll the inputs
+    if (!Inputs->Poll(&game, xOffset, yOffset, xRes, yRes))
+      quit = true;
+
     // Render if paused, otherwise run a frame
     if (paused)
       Model3->RenderFrame();
     else
       Model3->RunFrame();
-
-    // Poll the inputs
-    if (!Inputs->Poll(&game, xOffset, yOffset, xRes, yRes))
-      quit = true;
 
 #ifdef SUPERMODEL_DEBUGGER
     bool processUI = true;
@@ -1568,7 +1568,7 @@ static void Help(void)
 {
   Util::Config::Node defaultConfig = DefaultConfig();
   puts("Usage: Supermodel <romset> [options]");
-  puts("ROM set must be a valid ZIP file containing a single game.");
+  puts("ROM set must be a valid ZIP file containing a single game or merged set.");
   puts("");
   puts("General Options:");
   puts("  -?, -h, -help, --help   Print this help text");
