@@ -46,7 +46,7 @@ CInputs::CInputs(CInputSystem *system)
 	// the config file.
 	
 	// UI Controls  
-	//uiExit             = AddSwitchInput("UIExit",             "Exit UI",               Game::INPUT_UI, "JOY1_BUTTON9+JOY1_BUTTON10");
+	uiExit             = AddSwitchInput("UIExit",             "Exit UI",               Game::INPUT_UI, "KEY_ESCAPE");
 	uiReset            = AddSwitchInput("UIReset",            "Reset",                 Game::INPUT_UI, "KEY_ALT+KEY_R");
 	//uiPause            = AddSwitchInput("UIPause",            "Pause",                 Game::INPUT_UI, "KEY_ALT+KEY_P");
 	uiFullScreen       = AddSwitchInput("UIFullScreen",       "Toggle Fullscreen",     Game::INPUT_UI, "KEY_ALT+KEY_RETURN");
@@ -76,7 +76,6 @@ CInputs::CInputs(CInputSystem *system)
 	service[1]         = AddSwitchInput("ServiceB", "Service B", Game::INPUT_COMMON, "NONE");
 	test[0]            = AddSwitchInput("TestA",    "Test A",    Game::INPUT_COMMON, "NONE");
 	test[1]            = AddSwitchInput("TestB",    "Test B",    Game::INPUT_COMMON, "NONE");
-	uiExit             = AddSwitchInput("UIExit",   "Exit UI",   Game::INPUT_COMMON, "NONE");
 	uiPause            = AddSwitchInput("UIPause",  "Pause",     Game::INPUT_COMMON, "NONE");
 	uiScreenshot       = AddSwitchInput("UIScreenShot",	 "Screenshot",    Game::INPUT_COMMON, "NONE");
 	uiSaveState        = AddSwitchInput("UISaveState",   "Save State",    Game::INPUT_COMMON, "NONE");

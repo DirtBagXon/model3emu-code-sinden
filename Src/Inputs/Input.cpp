@@ -164,7 +164,10 @@ void CInput::LoadFromConfig(const Util::Config::Node &config)
 		{
 			// If found, then set mapping string
 			mapping = node->ValueAs<std::string>();
-			SetMapping(mapping.c_str());
+			if (strcmp(m_mapping, "KEY_ESCAPE") == 0)
+			    AppendMapping(mapping.c_str());
+			else
+			    SetMapping(mapping.c_str());
 			return;
 		}
 	}
