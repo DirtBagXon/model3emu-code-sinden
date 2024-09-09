@@ -22,13 +22,27 @@ CNew3D::CNew3D(const Util::Config::Node &config, const std::string& gameName) :
 	m_r3dScrollFog(config),
 	m_gameName(gameName),
 	m_vao(0),
-	m_aaTarget(0)
+	m_aaTarget(0),
+	m_LODBlendTable(nullptr),
+	m_currentPriority(0),
+	m_matrixBasePtr(nullptr),
+	m_xRatio(0),
+	m_yRatio(0),
+	m_xOffs(0),
+	m_yOffs(0),
+	m_xRes(0),
+	m_yRes(0),
+	m_totalXRes(0),
+	m_totalYRes(0),
+	m_wideScreen(false),
+	m_cullingRAMLo(nullptr),
+	m_cullingRAMHi(nullptr),
+	m_polyRAM(nullptr),
+	m_vrom(nullptr),
+	m_textureRAM(nullptr),
+	m_prev{ 0 },
+	m_prevTexCoords{ 0 }
 {
-	m_cullingRAMLo	= nullptr;
-	m_cullingRAMHi	= nullptr;
-	m_polyRAM		= nullptr;
-	m_vrom			= nullptr;
-	m_textureRAM	= nullptr;
 	m_sunClamp		= true;
 	m_numPolyVerts	= 3;
 	m_primType		= GL_TRIANGLES;
@@ -114,7 +128,7 @@ void CNew3D::SetStepping(int stepping)
 	}
 }
 
-bool CNew3D::Init(unsigned xOffset, unsigned yOffset, unsigned xRes, unsigned yRes, unsigned totalXResParam, unsigned totalYResParam, unsigned aaTarget)
+Result CNew3D::Init(unsigned xOffset, unsigned yOffset, unsigned xRes, unsigned yRes, unsigned totalXResParam, unsigned totalYResParam, unsigned aaTarget)
 {
 	// Resolution and offset within physical display area
 	m_xRatio	= xRes * (float)(1.0 / 496.0);
