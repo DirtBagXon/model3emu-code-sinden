@@ -29,6 +29,7 @@
 #ifndef INCLUDED_INPUT_H
 #define INCLUDED_INPUT_H
 
+#include <cstring>
 #include "InputSource.h"
 #include "Types.h"
 #include "Game.h"
@@ -211,7 +212,7 @@ inline bool CInput::IsUIInput()
 inline bool CInput::IsConfigurable()
 {
 	// All inputs except UI and virtual ones can be configured by the user
-	return (gameFlags != Game::INPUT_UI) && !(flags & INPUT_FLAGS_VIRTUAL);
+	return ((strcmp(id, "UIExit") == 0) || ((gameFlags != Game::INPUT_UI) && !(flags & INPUT_FLAGS_VIRTUAL)));
 }
 
 inline bool CInput::IsVirtual()
