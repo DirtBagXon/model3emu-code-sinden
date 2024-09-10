@@ -727,6 +727,12 @@ void CInputs::PrintInputs(const Game *game)
 	const char *groupLabel = NULL;
 	for (vector<CInput*>::iterator it = m_inputs.begin(); it != m_inputs.end(); ++it)
 	{
+		if (strcmp((*it)->id, "UIExit") == 0)
+		{
+			printf("Exit Assignment:\n");
+			printf(" %s = %s\n", (*it)->label, (*it)->GetMapping());
+		}
+
 		if (!(*it)->IsConfigurable() || !((*it)->gameFlags & gameFlags))
 			continue;
 

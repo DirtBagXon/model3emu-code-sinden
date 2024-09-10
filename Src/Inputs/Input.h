@@ -212,7 +212,7 @@ inline bool CInput::IsUIInput()
 inline bool CInput::IsConfigurable()
 {
 	// All inputs except UI and virtual ones can be configured by the user
-	return ((strcmp(m_mapping, "KEY_ESCAPE") == 0) || ((gameFlags != Game::INPUT_UI) && !(flags & INPUT_FLAGS_VIRTUAL)));
+	return ((strcmp(id, "UIExit") == 0) || ((gameFlags != Game::INPUT_UI) && !(flags & INPUT_FLAGS_VIRTUAL)));
 }
 
 inline bool CInput::IsVirtual()

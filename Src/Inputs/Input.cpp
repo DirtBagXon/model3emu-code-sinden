@@ -164,7 +164,7 @@ void CInput::LoadFromConfig(const Util::Config::Node &config)
 		{
 			// If found, then set mapping string
 			mapping = node->ValueAs<std::string>();
-			if (strcmp(m_mapping, "KEY_ESCAPE") == 0)
+			if (strcmp(id, "UIExit") == 0)
 			    AppendMapping(mapping.c_str());
 			else
 			    SetMapping(mapping.c_str());
