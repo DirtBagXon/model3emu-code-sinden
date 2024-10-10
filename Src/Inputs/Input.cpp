@@ -203,7 +203,7 @@ bool CInput::Configure(bool append, const char *escapeMapping)
 	return true;
 }
 
-bool CInput::Changed()
+bool CInput::Changed() const
 {
 	return value != prevValue;
 }

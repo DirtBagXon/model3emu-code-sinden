@@ -83,8 +83,7 @@ CMultiInputSource::CMultiInputSource(bool isOr, vector<CInputSource*> &sources) 
 
 CMultiInputSource::~CMultiInputSource()
 {
-	if (m_srcArray != NULL)
-		delete [] m_srcArray;
+	delete [] m_srcArray;
 }
 
 void CMultiInputSource::Acquire()
@@ -111,7 +110,7 @@ void CMultiInputSource::Release()
 	CInputSource::Release();
 }
 
-bool CMultiInputSource::GetValueAsSwitch(bool &val)
+bool CMultiInputSource::GetValueAsSwitch(bool &val) const
 {
 	if (m_isOr)
 	{
@@ -198,7 +197,7 @@ void CNegInputSource::Release()
 	CInputSource::Release();
 }
 
-bool CNegInputSource::GetValueAsSwitch(bool &val)
+bool CNegInputSource::GetValueAsSwitch(bool &val) const
 {
 	bool oldVal = val;
 	if (m_source->GetValueAsSwitch(val))
