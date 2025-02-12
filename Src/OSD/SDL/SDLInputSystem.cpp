@@ -678,6 +678,8 @@ bool CSDLInputSystem::Poll()
       Mouse *mouse;
       static Mouse mice[MAX_MICE];
       mouse = &mice[mm_event.device];
+      int max_width = get_total_width();
+      int max_height = get_total_height();
       float val, maxval;
 
       switch(mm_event.type) {
@@ -694,14 +696,14 @@ bool CSDLInputSystem::Poll()
 		if (mm_event.item == 0) {
 			mouse->x += mm_event.value;
 			if (mouse->x < 0) mouse->x = 0;
-			else if (mouse->x >= (int)get_total_width()) mouse->x = get_total_width();
+			else if (mouse->x >= max_width) mouse->x = max_width;
 
 			m_mouseX[mm_event.device] = mouse->x;
 		}
 		else if (mm_event.item == 1) {
 			mouse->y += mm_event.value;
 			if (mouse->y < 0) mouse->y = 0;
-			else if (mouse->y >= (int)get_total_height()) mouse->y = get_total_height();
+			else if (mouse->y >= max_height) mouse->y = max_height;
 
 			m_mouseY[mm_event.device] = mouse->y;
 		}
@@ -711,11 +713,11 @@ bool CSDLInputSystem::Poll()
 		maxval = (float) (mm_event.maxval - mm_event.minval);
 
 		if (mm_event.item == 0) {
-			mouse->x = (val / maxval) * get_total_width();
+			mouse->x = (val / maxval) * max_width;
 			m_mouseX[mm_event.device] = mouse->x;
 		}
 		else if (mm_event.item == 1) {
-			mouse->y = (val / maxval) * get_total_height();
+			mouse->y = (val / maxval) * max_height;
 			m_mouseY[mm_event.device] = mouse->y;
 		}
 		break;
