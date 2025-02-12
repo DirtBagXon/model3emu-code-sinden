@@ -1604,9 +1604,9 @@ static void Help(void)
   puts("  -crosshairs=<n>         Crosshairs configuration for gun games:");
   puts("                          0=none [Default], 1=P1 only, 2=P2 only, 3=P1 & P2");
   puts("  -nomousecursor          Disable desktop mouse cursor in SDL Windowed mode");
-  puts("  -new3d                  New 3D engine by Ian Curtis [Default]");
+  puts("  -new3d                  New 3D engine by Ian Curtis");
   puts("  -quad-rendering         Enable proper quad rendering");
-  puts("  -legacy3d               Legacy 3D engine (faster but less accurate)");
+  puts("  -legacy3d               Legacy 3D engine (faster but less accurate) [Default]");
   puts("  -multi-texture          Use 8 texture maps for decoding (legacy engine)");
   puts("  -no-multi-texture       Decode to single texture (legacy engine) [Default]");
   puts("  -vert-shader=<file>     Load Real3D vertex shader for 3D rendering");
