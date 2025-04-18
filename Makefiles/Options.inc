@@ -43,10 +43,9 @@ ifeq ($(strip $(VERBOSE)),1)
 endif
 
 #
-# Enable render state analyser for the legacy 3D engine (will slow down emulation!)
-#
 # Enable extra debug logging and render state analyser for the legacy 3D engine
 # (will slow down emulation!)
+#
 EXTRA_DEBUG =
 ifneq ($(filter $(strip $(EXTRA_DEBUG)),0 1),$(strip $(EXTRA_DEBUG)))
 	override EXTRA_DEBUG =
