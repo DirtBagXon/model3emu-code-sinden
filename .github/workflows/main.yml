@@ -26,15 +26,18 @@ jobs:
             outfile_ext: .exe
             shell: msys2 {0}
             archive: zip
+            builddir: bin64
           - os: ubuntu-latest
             makefile: Makefile.UNIX
             shell: bash
             archive: tgz
+            builddir: bin
           - os: macos-latest
             makefile: Makefile.OSX
             shell: bash
             archive: tgz
             archive_files: Frameworks/
+            builddir: bin
     runs-on: ${{ matrix.os }}
     defaults:
       run:
@@ -73,9 +76,9 @@ jobs:
             mingw64/mingw-w64-x86_64-SDL2
             mingw64/mingw-w64-x86_64-SDL2_net
       - name: Build
-        run: make -f Makefiles/${{ matrix.makefile }} release NET_BOARD=1 OUTFILE=../supermodel${{ matrix.outfile_ext }}
+        run: make -f Makefiles/${{ matrix.makefile }} release NET_BOARD=1
       - name: Validate
-        run: ./supermodel${{ matrix.outfile_ext }} -print-games
+        run: ${{ matrix.builddir }}/supermodel${{ matrix.outfile_ext }} -print-games
       - name: Create Distributions
         id: vars
         run: |
@@ -85,6 +88,7 @@ jobs:
         run: |
           mkdir NVRAM Saves ROMs GraphicsAnalysis
           cp Docs/LICENSE.txt Docs/README.txt Docs/FORKINFO.txt .
+          cp ${{ matrix.builddir }}/supermodel${{ matrix.outfile_ext }} .
           echo "NVRAM files go here." > NVRAM/DIR.txt
           echo "Save states go here." > Saves/DIR.txt
           echo "Graphics Analysis go here." > GraphicsAnalysis/DIR.txt

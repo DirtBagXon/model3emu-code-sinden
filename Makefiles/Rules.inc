@@ -33,8 +33,10 @@
 OBJ_DIR = obj$(strip $(BITS))
 BIN_DIR = bin$(strip $(BITS))
 
-OUTFILE = supermodel
+SUPERMODEL_BINARY = supermodel
+DISASSEMBLER_BINARY = ppcd
 
+OS := $(shell uname)
 
 ###############################################################################
 # Compiler Flags
@@ -88,7 +90,7 @@ endif
 COMMON_CFLAGS = -c $(ARCH) $(OPT) $(WARN) $(addprefix -I,$(sort $(INCLUDE_DIRS))) -DGLEW_STATIC $(SUPERMODEL_BUILD_FLAGS)
 CFLAGS = $(COMMON_CFLAGS) $(CSTD)
 CXXFLAGS = $(PLATFORM_CXXFLAGS) $(COMMON_CFLAGS) $(CXXSTD)
-LDFLAGS = -o $(BIN_DIR)/$(OUTFILE) $(PLATFORM_LDFLAGS) $(LDOPT)
+LDFLAGS = -o $(BIN_DIR)/$(SUPERMODEL_BINARY) $(PLATFORM_LDFLAGS) $(LDOPT)
 
 
 ###############################################################################
@@ -227,7 +229,14 @@ INCLUDE_DIRS = $(sort $(foreach file,$(SRC_FILES),$(dir	$(file))))
 # generated dependencies because otherwise, make gets confused for some reason
 # and thinks the default target is just one of the object files.
 #
-all:	$(BIN_DIR)/$(OUTFILE)
+
+ifeq ($(OS), Darwin)
+	ALL_TARGETS := $(BIN_DIR)/$(SUPERMODEL_BINARY)
+else
+	ALL_TARGETS := $(BIN_DIR)/$(DISASSEMBLER_BINARY) $(BIN_DIR)/$(SUPERMODEL_BINARY)
+endif
+
+all: $(ALL_TARGETS)
 
 #
 # Release targets: used only to create official builds stamped with the Git
@@ -241,9 +250,9 @@ release:: all
 print_message:
 	$(info Building Supermodel)
 
-$(BIN_DIR)/$(OUTFILE):	$(BIN_DIR) $(OBJ_DIR) $(OBJ_FILES)
+$(BIN_DIR)/$(SUPERMODEL_BINARY):	$(BIN_DIR) $(OBJ_DIR) $(OBJ_FILES)
 	$(info --------------------------------------------------------------------------------)
-	$(info Linking Supermodel     : $(BIN_DIR)/$(OUTFILE))
+	$(info Linking Supermodel     : $(BIN_DIR)/$(SUPERMODEL_BINARY))
 	$(SILENT)$(LD) $(OBJ_FILES) $(LDFLAGS)
 	$(info --------------------------------------------------------------------------------)
 
@@ -255,6 +264,13 @@ $(OBJ_DIR):
 	$(info Creating directory     : $(OBJ_DIR))
 	$(SILENT)mkdir $(OBJ_DIR)
 
+ifneq ($(OS), Darwin)
+$(BIN_DIR)/$(DISASSEMBLER_BINARY):  $(BIN_DIR) Src/CPU/PowerPC/PPCDisasm.cpp
+	$(info --------------------------------------------------------------------------------)
+	$(info Building Disassembler  : $(BIN_DIR)/$(DISASSEMBLER_BINARY))
+	$(SILENT)$(CXX) -o $(BIN_DIR)/$(DISASSEMBLER_BINARY) Src/CPU/PowerPC/PPCDisasm.cpp -DSTANDALONE $(OPT) $(WARN) $(addprefix -I,$(sort $(INCLUDE_DIRS)))
+	$(info --------------------------------------------------------------------------------)
+endif
 
 ###############################################################################
 # Rules
