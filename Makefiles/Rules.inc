@@ -36,8 +36,6 @@ BIN_DIR = bin$(strip $(BITS))
 SUPERMODEL_BINARY = supermodel
 DISASSEMBLER_BINARY = ppcd
 
-OS := $(shell uname)
-
 ###############################################################################
 # Compiler Flags
 ###############################################################################
@@ -230,13 +228,7 @@ INCLUDE_DIRS = $(sort $(foreach file,$(SRC_FILES),$(dir	$(file))))
 # and thinks the default target is just one of the object files.
 #
 
-ifeq ($(OS), Darwin)
-	ALL_TARGETS := $(BIN_DIR)/$(SUPERMODEL_BINARY)
-else
-	ALL_TARGETS := $(BIN_DIR)/$(DISASSEMBLER_BINARY) $(BIN_DIR)/$(SUPERMODEL_BINARY)
-endif
-
-all: $(ALL_TARGETS)
+all:	$(BIN_DIR)/$(DISASSEMBLER_BINARY) $(BIN_DIR)/$(SUPERMODEL_BINARY)
 
 #
 # Release targets: used only to create official builds stamped with the Git
@@ -264,13 +256,11 @@ $(OBJ_DIR):
 	$(info Creating directory     : $(OBJ_DIR))
 	$(SILENT)mkdir $(OBJ_DIR)
 
-ifneq ($(OS), Darwin)
 $(BIN_DIR)/$(DISASSEMBLER_BINARY):  $(BIN_DIR) Src/CPU/PowerPC/PPCDisasm.cpp
 	$(info --------------------------------------------------------------------------------)
 	$(info Building Disassembler  : $(BIN_DIR)/$(DISASSEMBLER_BINARY))
-	$(SILENT)$(CXX) -o $(BIN_DIR)/$(DISASSEMBLER_BINARY) Src/CPU/PowerPC/PPCDisasm.cpp -DSTANDALONE $(OPT) $(WARN) $(addprefix -I,$(sort $(INCLUDE_DIRS)))
+	$(SILENT)$(LD) -o $(BIN_DIR)/$(DISASSEMBLER_BINARY) Src/CPU/PowerPC/PPCDisasm.cpp -DSTANDALONE $(OPT) $(WARN) $(addprefix -I,$(sort $(INCLUDE_DIRS))) $(CXXSTD) $(PLATFORM_LDFLAGS)
 	$(info --------------------------------------------------------------------------------)
-endif
 
 ###############################################################################
 # Rules

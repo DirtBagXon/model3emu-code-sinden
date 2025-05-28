@@ -88,12 +88,13 @@ jobs:
         run: |
           mkdir NVRAM Saves ROMs GraphicsAnalysis
           cp Docs/LICENSE.txt Docs/README.txt Docs/FORKINFO.txt .
+          cp ${{ matrix.builddir }}/ppcd${{ matrix.outfile_ext }} .
           cp ${{ matrix.builddir }}/supermodel${{ matrix.outfile_ext }} .
           echo "NVRAM files go here." > NVRAM/DIR.txt
           echo "Save states go here." > Saves/DIR.txt
           echo "Graphics Analysis go here." > GraphicsAnalysis/DIR.txt
           echo "Recommended (but not mandatory) location for ROM sets." > ROMs/DIR.txt
-          FILES="supermodel${{ matrix.outfile_ext }} LICENSE.txt README.txt FORKINFO.txt Config/ Assets/ NVRAM/ Saves/ ROMs/ GraphicsAnalysis/ ${{ matrix.archive_files }}"
+          FILES="ppcd${{ matrix.outfile_ext }} supermodel${{ matrix.outfile_ext }} LICENSE.txt README.txt FORKINFO.txt Config/ Assets/ NVRAM/ Saves/ ROMs/ GraphicsAnalysis/ ${{ matrix.archive_files }}"
           if [[ "${{ matrix.archive }}" == "tgz" ]] ; then
             tar -zcvf supermodel-${{ env.COMMIT_SHORT_SHA }}.tgz $FILES
           elif [[ "${{ matrix.archive }}" == "zip" ]] ; then
