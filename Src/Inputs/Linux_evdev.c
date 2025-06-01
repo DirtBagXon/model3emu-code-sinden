@@ -212,6 +212,7 @@ static int init_mouse(const char *fname, int fd)
         snprintf(mouse->name, sizeof (mouse->name), "Unknown device");
 
     mouse->fd = fd;
+    /* skipping past "/dev/input/event" so we isolate the number */
     mouse->eventNum = atoi(fname+16);
 
     return 1;
@@ -285,6 +286,7 @@ static int linux_evdev_init(const int onlyAbs)
 
     closedir(dirp);
 
+    /* Sort devices based on eventfile number (from first to most recently registered) */
     if(available_mice)
         qsort(mice, available_mice, sizeof(MouseStruct), sort_devices);
 
