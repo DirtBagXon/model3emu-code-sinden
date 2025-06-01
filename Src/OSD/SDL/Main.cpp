@@ -1584,6 +1584,9 @@ static Util::Config::Node DefaultConfig()
 #endif
 #else
   config.Set("InputSystem", "sdl");
+#ifdef SUPERMODEL_MANYMOUSE
+  config.Set("ABSMiceOnly", true);
+#endif
   // SDL ForceFeedback
   config.Set("SDLConstForceMax", "100");
   config.Set("SDLSelfCenterMax", "100");
@@ -1808,7 +1811,7 @@ static ParsedCommandLine ParseCommandLine(int argc, char **argv)
     { "-no-force-feedback",   { "ForceFeedback",    false } },
     { "-force-feedback",      { "ForceFeedback",    true } },
 #ifdef SUPERMODEL_MANYMOUSE
-    { "-lightguns-only",      { "ABSMiceFilter",    true }},
+    { "-lightguns-only",      { "ABSMiceOnly",      true }},
 #endif
     { "-dump-textures",       { "DumpTextures",     true } },
   };
@@ -1985,7 +1988,7 @@ static ParsedCommandLine ParseCommandLine(int argc, char **argv)
         cmd_line.print_inputs = true;
 #ifdef SUPERMODEL_MANYMOUSE
       else if (arg == "-lightguns-only")
-        cmd_line.config.Set("ABSMiceFilter", true);
+        cmd_line.config.Set("ABSMiceOnly", true);
 #endif
 #ifdef SUPERMODEL_DEBUGGER
       else if (arg == "-disable-debugger")
