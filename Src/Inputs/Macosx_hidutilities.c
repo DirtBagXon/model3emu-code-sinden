@@ -1579,7 +1579,7 @@ static void macosx_hidutilities_quit(void)
 } /* macosx_hidutilities_quit */
 
 
-static int macosx_hidutilities_init(void)
+static int macosx_hidutilities_init(const int onlyAbs)
 {
     macosx_hidutilities_quit();  /* just in case... */
 

@@ -483,7 +483,7 @@ bool CSDLInputSystem::InitializeSystem()
 
 #ifdef SUPERMODEL_MANYMOUSE
   // Initiate ManyMouse
-  available_mice = ManyMouse_Init();
+  available_mice = ManyMouse_Init(m_config["ABSMiceFilter"].ValueAs<bool>());
   static MouseDetails mice[MAX_MICE];
 
   std::cout << std::endl;

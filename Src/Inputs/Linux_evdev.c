@@ -40,6 +40,7 @@ typedef struct
 
 static MouseStruct mice[MAX_MICE];
 static unsigned int available_mice = 0;
+static unsigned int absOnly = 0;
 
 
 static int poll_mouse(MouseStruct *mouse, ManyMouseEvent *outevent)
@@ -189,7 +190,7 @@ static int init_mouse(const char *fname, int fd)
         }
     }
 
-    if (!is_mouse || (getenv("SUPERMODEL_GUNSONLY") != NULL && is_mouse && !has_absolutes) )
+    if (!is_mouse || (absOnly && is_mouse && !has_absolutes) )
         return 0;
 
     mouse->min_x = mouse->min_y = mouse->max_x = mouse->max_y = 0;
@@ -258,8 +259,9 @@ static int sort_devices(const void* a, const void* b)
 }
 
 
-static int linux_evdev_init(void)
+static int linux_evdev_init(const int onlyAbs)
 {
+    absOnly = onlyAbs;
     DIR *dirp;
     struct dirent *dent;
     int i;

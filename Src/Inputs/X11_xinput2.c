@@ -63,6 +63,9 @@ static ManyMouseEvent input_events[MAX_EVENTS];
 static volatile int input_events_read = 0;
 static volatile int input_events_write = 0;
 
+// Currently a dummy stub
+static unsigned int absOnly = 0;
+
 static void queue_event(const ManyMouseEvent *event)
 {
     /* copy the event info. We'll process it in ManyMouse_PollEvent(). */
@@ -321,8 +324,9 @@ static int x11_xinput2_init_internal(void)
 } /* x11_xinput2_init_internal */
 
 
-static int x11_xinput2_init(void)
+static int x11_xinput2_init(const int onlyAbs)
 {
+    absOnly = onlyAbs;
     int retval = x11_xinput2_init_internal();
     if (retval < 0)
         xinput2_cleanup();

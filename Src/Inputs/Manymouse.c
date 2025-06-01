@@ -39,7 +39,7 @@ static const ManyMouseDriver **mice_drivers[] =
 
 static const ManyMouseDriver *driver = NULL;
 
-int ManyMouse_Init(void)
+int ManyMouse_Init(const int onlyAbs)
 {
     const int upper = (sizeof (mice_drivers) / sizeof (mice_drivers[0]));
     int i;
@@ -57,7 +57,7 @@ int ManyMouse_Init(void)
         const ManyMouseDriver *this_driver = *(mice_drivers[i]);
         if (this_driver != NULL) /* if not built for this platform, skip it. */
         {
-            const int mice = this_driver->init();
+            const int mice = this_driver->init(onlyAbs);
             if (mice > retval) {
                 retval = mice; /* may move from "error" to "no mice found". */
 	    }
