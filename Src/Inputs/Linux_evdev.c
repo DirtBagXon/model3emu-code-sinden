@@ -34,6 +34,7 @@ typedef struct
     int min_y;
     int max_x;
     int max_y;
+    int eventNum;
     char name[64];
 } MouseStruct;
 
@@ -177,14 +178,18 @@ static int init_mouse(const char *fname, int fd)
 
     if (ioctl(fd, EVIOCGBIT(EV_ABS, sizeof (abscaps)), abscaps) != -1)
     {
-        if ( (test_bit(abscaps, ABS_X)) && (test_bit(abscaps, ABS_Y)) )
+        // rule out extra axis that might be used on some gamepads to filter those out.
+        if ( test_bit(abscaps, ABS_X) && test_bit(abscaps, ABS_Y)
+            && !(test_bit(abscaps, ABS_RX) || test_bit(abscaps, ABS_RY) ||
+                 test_bit(abscaps, ABS_HAT0X) || test_bit(abscaps, ABS_HAT0Y))
+           )
         {
             is_mouse = 1;
             has_absolutes = 1;
         }
     }
 
-    if (!is_mouse)
+    if (!is_mouse || (getenv("SUPERMODEL_GUNSONLY") != NULL && is_mouse && !has_absolutes) )
         return 0;
 
     mouse->min_x = mouse->min_y = mouse->max_x = mouse->max_y = 0;
@@ -206,6 +211,7 @@ static int init_mouse(const char *fname, int fd)
         snprintf(mouse->name, sizeof (mouse->name), "Unknown device");
 
     mouse->fd = fd;
+    mouse->eventNum = atoi(fname+16);
 
     return 1;
 } /* init_mouse */
@@ -241,6 +247,17 @@ static int open_if_mouse(const char *fname)
 } /* open_if_mouse */
 
 
+static int sort_devices(const void* a, const void* b)
+{
+    MouseStruct *arg1 = (MouseStruct*)a;
+    MouseStruct *arg2 = (MouseStruct*)b;
+
+    // no two devices can share event number
+    if(arg1->eventNum < arg2->eventNum) return -1;
+    else return 1;
+}
+
+
 static int linux_evdev_init(void)
 {
     DIR *dirp;
@@ -256,6 +273,7 @@ static int linux_evdev_init(void)
 
     while ((dent = readdir(dirp)) != NULL)
     {
+        if(strstr(dent->d_name, "event") == NULL) continue;
         char fname[384];
         snprintf(fname, sizeof (fname), "/dev/input/%s", dent->d_name);
         if (open_if_mouse(fname))
@@ -264,6 +282,9 @@ static int linux_evdev_init(void)
     } /* while */
 
     closedir(dirp);
+
+    if(available_mice)
+        qsort(mice, available_mice, sizeof(MouseStruct), sort_devices);
 
     return (int)available_mice;
 } /* linux_evdev_init */
