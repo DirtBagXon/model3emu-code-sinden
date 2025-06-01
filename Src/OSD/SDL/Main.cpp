@@ -1585,7 +1585,7 @@ static Util::Config::Node DefaultConfig()
 #else
   config.Set("InputSystem", "sdl");
 #ifdef SUPERMODEL_MANYMOUSE
-  config.Set("ABSMiceOnly", true);
+  config.Set("ABSMiceOnly", false);
 #endif
   // SDL ForceFeedback
   config.Set("SDLConstForceMax", "100");
