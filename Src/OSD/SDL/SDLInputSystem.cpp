@@ -474,7 +474,7 @@ bool CSDLInputSystem::InitializeSystem()
 
 #if not defined(__APPLE__) && not defined(_WIN32)
   // Initiate ManyMouse
-  available_mice = ManyMouse_Init();
+  available_mice = ManyMouse_Init(m_config["ABSMiceOnly"].ValueAs<bool>());
   static MouseDetails mice[MAX_MICE];
 
   std::cout << std::endl;

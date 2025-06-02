@@ -8,6 +8,7 @@
  */
 
 #include <stdlib.h>
+#include <stdio.h>
 #include "Manymouse.h"
 
 static const char *manymouse_copyright =
@@ -28,14 +29,14 @@ extern const ManyMouseDriver *ManyMouseDriver_xinput2;
  */
 static const ManyMouseDriver **mice_drivers[] =
 {
-    &ManyMouseDriver_xinput2,
-    &ManyMouseDriver_evdev
+    &ManyMouseDriver_evdev,
+    &ManyMouseDriver_xinput2
 };
 
 
 static const ManyMouseDriver *driver = NULL;
 
-int ManyMouse_Init(void)
+int ManyMouse_Init(const int onlyAbs)
 {
     const int upper = (sizeof (mice_drivers) / sizeof (mice_drivers[0]));
     int i;
@@ -48,20 +49,27 @@ int ManyMouse_Init(void)
     if (driver != NULL)
         return -1;
 
-    for (i = 0; (i < upper) && (driver == NULL); i++)
+    for (i = 0; i < upper && driver == NULL; i++)
     {
         const ManyMouseDriver *this_driver = *(mice_drivers[i]);
         if (this_driver != NULL) /* if not built for this platform, skip it. */
         {
-            const int mice = this_driver->init();
-            if (mice > retval) {
+            const int mice = this_driver->init(onlyAbs);
+            if (mice > retval)
                 retval = mice; /* may move from "error" to "no mice found". */
-	    }
 
-            if (mice >= 0)
+            if (mice > 0) {
                 driver = this_driver;
+                break;
+            } else {
+                this_driver->quit();
+                this_driver = NULL;
+                retval = -1;
+            }
         } /* if */
     } /* for */
+
+    printf("Initialized ManyMouse using %s backend\n", driver == NULL ? "no" : ManyMouse_DriverName());
 
     return retval;
 } /* ManyMouse_Init */

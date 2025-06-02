@@ -34,11 +34,13 @@ typedef struct
     int min_y;
     int max_x;
     int max_y;
+    int eventNum;
     char name[64];
 } MouseStruct;
 
 static MouseStruct mice[MAX_MICE];
 static unsigned int available_mice = 0;
+static unsigned int absOnly = 0;
 
 
 static int poll_mouse(MouseStruct *mouse, ManyMouseEvent *outevent)
@@ -177,14 +179,18 @@ static int init_mouse(const char *fname, int fd)
 
     if (ioctl(fd, EVIOCGBIT(EV_ABS, sizeof (abscaps)), abscaps) != -1)
     {
-        if ( (test_bit(abscaps, ABS_X)) && (test_bit(abscaps, ABS_Y)) )
+        // rule out extra axis that might be used on some gamepads to filter those out.
+        if ( test_bit(abscaps, ABS_X) && test_bit(abscaps, ABS_Y)
+            && !(test_bit(abscaps, ABS_RX) || test_bit(abscaps, ABS_RY) ||
+                 test_bit(abscaps, ABS_HAT0X) || test_bit(abscaps, ABS_HAT0Y))
+           )
         {
             is_mouse = 1;
             has_absolutes = 1;
         }
     }
 
-    if (!is_mouse)
+    if (!is_mouse || (absOnly && is_mouse && !has_absolutes) )
         return 0;
 
     mouse->min_x = mouse->min_y = mouse->max_x = mouse->max_y = 0;
@@ -206,6 +212,8 @@ static int init_mouse(const char *fname, int fd)
         snprintf(mouse->name, sizeof (mouse->name), "Unknown device");
 
     mouse->fd = fd;
+    /* skipping past "/dev/input/event" so we isolate the number */
+    mouse->eventNum = atoi(fname+16);
 
     return 1;
 } /* init_mouse */
@@ -241,8 +249,20 @@ static int open_if_mouse(const char *fname)
 } /* open_if_mouse */
 
 
-static int linux_evdev_init(void)
+static int sort_devices(const void* a, const void* b)
 {
+    MouseStruct *arg1 = (MouseStruct*)a;
+    MouseStruct *arg2 = (MouseStruct*)b;
+
+    // no two devices can share event number
+    if (arg1->eventNum < arg2->eventNum) return -1;
+    else return 1;
+}
+
+
+static int linux_evdev_init(const int onlyAbs)
+{
+    absOnly = onlyAbs;
     DIR *dirp;
     struct dirent *dent;
     int i;
@@ -256,6 +276,7 @@ static int linux_evdev_init(void)
 
     while ((dent = readdir(dirp)) != NULL)
     {
+        if (strstr(dent->d_name, "event") == NULL) continue;
         char fname[384];
         snprintf(fname, sizeof (fname), "/dev/input/%s", dent->d_name);
         if (open_if_mouse(fname))
@@ -264,6 +285,10 @@ static int linux_evdev_init(void)
     } /* while */
 
     closedir(dirp);
+
+    /* Sort devices based on eventfile number (from first to most recently registered) */
+    if (available_mice)
+        qsort(mice, available_mice, sizeof(MouseStruct), sort_devices);
 
     return (int)available_mice;
 } /* linux_evdev_init */
