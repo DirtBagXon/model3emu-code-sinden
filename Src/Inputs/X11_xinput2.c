@@ -284,9 +284,6 @@ static int x11_xinput2_init_internal(void)
 
     xinput2_cleanup();  /* just in case... */
 
-    if (getenv("MANYMOUSE_NO_XINPUT2") != NULL)
-        return -1;
-
     if (!find_api_symbols())
         return -1;  /* couldn't find all needed symbols. */
 
