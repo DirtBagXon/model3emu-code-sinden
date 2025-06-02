@@ -86,6 +86,7 @@ jobs:
           echo "COMMIT_SHORT_SHA=$ShortSHA" >> $GITHUB_ENV
       - name: Package
         run: |
+          rm -f Config/Supermodel.ini
           mkdir NVRAM Saves ROMs GraphicsAnalysis
           cp Docs/LICENSE.txt Docs/README.txt Docs/FORKINFO.txt .
           cp ${{ matrix.builddir }}/ppcd${{ matrix.outfile_ext }} .

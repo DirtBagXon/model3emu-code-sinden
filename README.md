@@ -18,6 +18,7 @@ This repo will attempt to track the official git repo commits.
     -sinden=<n>       Sinden border configuration for gun games:
                       0=none [Default], 1=standard, 2=wide
     -nomousecursor    Disable desktop mouse cursor in SDL Windowed mode
+    -abs-mice-only    Linux [evdev] absolute mouse movement filtering [lightguns]
 
 **ManyMouse Notes:**
 

@@ -64,6 +64,7 @@ int ManyMouse_Init(const int onlyAbs)
 
             if (mice > 0) {
                 driver = this_driver;
+                break;
             } else {
                 this_driver->quit();
                 this_driver = NULL;
