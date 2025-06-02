@@ -53,7 +53,7 @@ int ManyMouse_Init(const int onlyAbs)
     if (driver != NULL)
         return -1;
 
-    for (i = 0; i < upper; i++)
+    for (i = 0; i < upper && driver == NULL; i++)
     {
         const ManyMouseDriver *this_driver = *(mice_drivers[i]);
         if (this_driver != NULL) /* if not built for this platform, skip it. */
@@ -64,7 +64,10 @@ int ManyMouse_Init(const int onlyAbs)
 
             if (mice > 0) {
                 driver = this_driver;
-                break; /* exit early since we've got our driver of choice */
+            } else {
+                this_driver->quit();
+                this_driver = NULL;
+                retval = -1;
             }
         } /* if */
     } /* for */
