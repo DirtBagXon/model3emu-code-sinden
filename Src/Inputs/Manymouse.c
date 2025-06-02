@@ -32,8 +32,8 @@ static const ManyMouseDriver **mice_drivers[] =
 {
     &ManyMouseDriver_hidmanager,
     &ManyMouseDriver_hidutilities,
-    &ManyMouseDriver_xinput2,
-    &ManyMouseDriver_evdev
+    &ManyMouseDriver_evdev,
+    &ManyMouseDriver_xinput2
 };
 
 
@@ -52,18 +52,19 @@ int ManyMouse_Init(const int onlyAbs)
     if (driver != NULL)
         return -1;
 
-    for (i = 0; (i < upper) && (driver == NULL); i++)
+    for (i = 0; i < upper; i++)
     {
         const ManyMouseDriver *this_driver = *(mice_drivers[i]);
         if (this_driver != NULL) /* if not built for this platform, skip it. */
         {
             const int mice = this_driver->init(onlyAbs);
-            if (mice > retval) {
+            if (mice > retval)
                 retval = mice; /* may move from "error" to "no mice found". */
-	    }
 
-            if (mice >= 0)
+            if (mice > 0) {
                 driver = this_driver;
+                break; /* exit early since we've got our driver of choice */
+            }
         } /* if */
     } /* for */
 
