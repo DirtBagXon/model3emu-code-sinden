@@ -8,6 +8,7 @@
  */
 
 #include <stdlib.h>
+#include <stdio.h>
 #include "Manymouse.h"
 
 static const char *manymouse_copyright =
@@ -67,6 +68,8 @@ int ManyMouse_Init(const int onlyAbs)
             }
         } /* if */
     } /* for */
+
+    printf("Initialized ManyMouse using %s backend\n", driver == NULL ? "no" : ManyMouse_DriverName());
 
     return retval;
 } /* ManyMouse_Init */
