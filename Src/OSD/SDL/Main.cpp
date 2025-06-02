@@ -1584,6 +1584,9 @@ static Util::Config::Node DefaultConfig()
 #endif
 #else
   config.Set("InputSystem", "sdl");
+#ifdef SUPERMODEL_MANYMOUSE
+  config.Set("ABSMiceOnly", false);
+#endif
   // SDL ForceFeedback
   config.Set("SDLConstForceMax", "100");
   config.Set("SDLSelfCenterMax", "100");
@@ -1688,6 +1691,9 @@ static void Help(void)
 #ifdef SUPERMODEL_WIN32
   printf("  -input-system=<s>       Input system [Default: %s]\n", defaultConfig["InputSystem"].ValueAs<std::string>().c_str());
   printf("  -outputs=<s>            Outputs [Default: %s]\n", defaultConfig["Outputs"].ValueAs<std::string>().c_str());
+#endif
+#ifdef SUPERMODEL_MANYMOUSE
+  puts("  -abs-mice-only          Filter non-Absolute Positional Mouse Devices");
 #endif
   puts("  -print-inputs           Prints current input configuration");
   puts("");
@@ -1804,6 +1810,9 @@ static ParsedCommandLine ParseCommandLine(int argc, char **argv)
 #endif
     { "-no-force-feedback",   { "ForceFeedback",    false } },
     { "-force-feedback",      { "ForceFeedback",    true } },
+#ifdef SUPERMODEL_MANYMOUSE
+    { "-abs-mice-only",      { "ABSMiceOnly",      true }},
+#endif
     { "-dump-textures",       { "DumpTextures",     true } },
   };
   for (int i = 1; i < argc; i++)
@@ -1977,6 +1986,10 @@ static ParsedCommandLine ParseCommandLine(int argc, char **argv)
         cmd_line.config_inputs = true;
       else if (arg == "-print-inputs")
         cmd_line.print_inputs = true;
+#ifdef SUPERMODEL_MANYMOUSE
+      else if (arg == "-lightguns-only")
+        cmd_line.config.Set("ABSMiceOnly", true);
+#endif
 #ifdef SUPERMODEL_DEBUGGER
       else if (arg == "-disable-debugger")
         cmd_line.disable_debugger = true;

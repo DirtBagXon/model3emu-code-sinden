@@ -94,6 +94,13 @@
     "PortOut = 1971\n"
     "AddressOut = \"127.0.0.1\"\n"
     "\n"
+#ifdef SUPERMODEL_MANYMOUSE
+    "; Input\n"
+    "; Sets the ManyMouse backend to ignore any mouse devices that don't provide\n"
+    "; absolute positioning when enabled, ideal for using Lightguns.\n"
+    "ABSMiceOnly = false\n"
+    "\n"
+#endif
     "; Common\n"
     "InputUIExit = \"JOY1_BUTTON10+JOY1_BUTTON9\"\n"
     "InputStart1 = \"KEY_1,JOY1_BUTTON9\"\n"
