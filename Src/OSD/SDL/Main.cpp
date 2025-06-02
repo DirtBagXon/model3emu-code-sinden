@@ -1693,7 +1693,7 @@ static void Help(void)
   printf("  -outputs=<s>            Outputs [Default: %s]\n", defaultConfig["Outputs"].ValueAs<std::string>().c_str());
 #endif
 #ifdef SUPERMODEL_MANYMOUSE
-  puts("  -lightguns-only         Filter non-Absolute Positional Mouse Devices");
+  puts("  -abs-mice-only          Filter non-Absolute Positional Mouse Devices");
 #endif
   puts("  -print-inputs           Prints current input configuration");
   puts("");
@@ -1811,7 +1811,7 @@ static ParsedCommandLine ParseCommandLine(int argc, char **argv)
     { "-no-force-feedback",   { "ForceFeedback",    false } },
     { "-force-feedback",      { "ForceFeedback",    true } },
 #ifdef SUPERMODEL_MANYMOUSE
-    { "-lightguns-only",      { "ABSMiceOnly",      true }},
+    { "-abs-mice-only",      { "ABSMiceOnly",      true }},
 #endif
     { "-dump-textures",       { "DumpTextures",     true } },
   };
