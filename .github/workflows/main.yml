@@ -19,7 +19,7 @@ jobs:
         os:
           - ubuntu-latest
           - windows-latest
-          - macos-latest
+          - macos-14
         include:
           - os: windows-latest
             makefile: Makefile.Win32
@@ -32,7 +32,7 @@ jobs:
             shell: bash
             archive: tgz
             builddir: bin
-          - os: macos-latest
+          - os: macos-14
             makefile: Makefile.OSX
             shell: bash
             archive: tgz
