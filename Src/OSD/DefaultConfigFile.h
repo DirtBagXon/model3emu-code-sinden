@@ -213,10 +213,17 @@
     "InputAnalogJoyRight = \"KEY_RIGHT\"           ; digital, move right\n"
     "InputAnalogJoyUp = \"KEY_UP\"                 ; digital, move up\n"
     "InputAnalogJoyDown = \"KEY_DOWN\"             ; digital, move down\n"
+#ifdef SUPERMODEL_MANYMOUSE
+    "InputAnalogJoyX = \"JOY_XAXIS,MOUSE1_XAXIS\"   ; analog, full X axis\n"
+    "InputAnalogJoyY = \"JOY_YAXIS,MOUSE1_YAXIS\"   ; analog, full Y axis\n"
+    "InputAnalogJoyTrigger = \"KEY_A,JOY_BUTTON1,MOUSE1_LEFT_BUTTON\"\n"
+    "InputAnalogJoyEvent = \"KEY_S,JOY_BUTTON2,MOUSE1_RIGHT_BUTTON\"\n"
+#else
     "InputAnalogJoyX = \"JOY_XAXIS,MOUSE_XAXIS\"   ; analog, full X axis\n"
     "InputAnalogJoyY = \"JOY_YAXIS,MOUSE_YAXIS\"   ; analog, full Y axis\n"
     "InputAnalogJoyTrigger = \"KEY_A,JOY_BUTTON1,MOUSE_LEFT_BUTTON\"\n"
     "InputAnalogJoyEvent = \"KEY_S,JOY_BUTTON2,MOUSE_RIGHT_BUTTON\"\n"
+#endif
     "InputAnalogJoyTrigger2 = \"KEY_D,JOY_BUTTON2\"\n"
     "InputAnalogJoyEvent2 = \"NONE\"\n"
     "\n"
@@ -225,19 +232,33 @@
     "InputGunRight = \"KEY_RIGHT\"             ; digital, move gun right\n"
     "InputGunUp = \"KEY_UP\"                   ; digital, move gun up\n"
     "InputGunDown = \"KEY_DOWN\"               ; digital, move gun down\n"
+#ifdef SUPERMODEL_MANYMOUSE
+    "InputGunX = \"MOUSE1_XAXIS,JOY1_XAXIS\"    ; analog, full X axis\n"
+    "InputGunY = \"MOUSE1_YAXIS,JOY1_YAXIS\"    ; analog, full Y axis\n"
+    "InputTrigger = \"KEY_A,JOY1_BUTTON1,MOUSE1_LEFT_BUTTON\"\n"
+    "InputOffscreen = \"KEY_S,JOY1_BUTTON2,MOUSE1_RIGHT_BUTTON\"    ; point off-screen\n"
+#else
     "InputGunX = \"MOUSE_XAXIS,JOY1_XAXIS\"    ; analog, full X axis\n"
     "InputGunY = \"MOUSE_YAXIS,JOY1_YAXIS\"    ; analog, full Y axis\n"
     "InputTrigger = \"KEY_A,JOY1_BUTTON1,MOUSE_LEFT_BUTTON\"\n"
     "InputOffscreen = \"KEY_S,JOY1_BUTTON2,MOUSE_RIGHT_BUTTON\"    ; point off-screen\n"
+#endif
     "InputAutoTrigger = 0                    ; automatic reload when off-screen\n"
     "InputGunLeft2 = \"NONE\"\n"
     "InputGunRight2 = \"NONE\"\n"
     "InputGunUp2 = \"NONE\"\n"
     "InputGunDown2 = \"NONE\"\n"
+#ifdef SUPERMODEL_MANYMOUSE
+    "InputGunX2 = \"MOUSE2_XAXIS,JOY2_XAXIS\"\n"
+    "InputGunY2 = \"MOUSE2_YAXIS,JOY2_YAXIS\"\n"
+    "InputTrigger2 = \"JOY2_BUTTON1,MOUSE2_LEFT_BUTTON\"\n"
+    "InputOffscreen2 = \"JOY2_BUTTON2,MOUSE2_RIGHT_BUTTON\"\n"
+#else
     "InputGunX2 = \"JOY2_XAXIS\"\n"
     "InputGunY2 = \"JOY2_YAXIS\"\n"
     "InputTrigger2 = \"JOY2_BUTTON1\"\n"
     "InputOffscreen2 = \"JOY2_BUTTON2\"\n"
+#endif
     "InputAutoTrigger2 = 0\n"
     "\n"
     "; Analog guns (Ocean Hunter, LA Machineguns)\n"
@@ -245,10 +266,17 @@
     "InputAnalogGunRight = \"KEY_RIGHT\"             ; digital, move gun right\n"
     "InputAnalogGunUp = \"KEY_UP\"                   ; digital, move gun up\n"
     "InputAnalogGunDown = \"KEY_DOWN\"               ; digital, move gun down\n"
+#ifdef SUPERMODEL_MANYMOUSE
+    "InputAnalogGunX = \"MOUSE1_XAXIS,JOY1_XAXIS\"    ; analog, full X axis\n"
+    "InputAnalogGunY = \"MOUSE1_YAXIS,JOY1_YAXIS\"    ; analog, full Y axis\n"
+    "InputAnalogTriggerLeft = \"KEY_A,JOY1_BUTTON1,MOUSE1_LEFT_BUTTON\"\n"
+    "InputAnalogTriggerRight = \"KEY_S,JOY1_BUTTON2,MOUSE1_RIGHT_BUTTON\"\n"
+#else
     "InputAnalogGunX = \"MOUSE_XAXIS,JOY1_XAXIS\"    ; analog, full X axis\n"
     "InputAnalogGunY = \"MOUSE_YAXIS,JOY1_YAXIS\"    ; analog, full Y axis\n"
     "InputAnalogTriggerLeft = \"KEY_A,JOY1_BUTTON1,MOUSE_LEFT_BUTTON\"\n"
     "InputAnalogTriggerRight = \"KEY_S,JOY1_BUTTON2,MOUSE_RIGHT_BUTTON\"\n"
+#endif
     "InputAnalogGunLeft2 = \"NONE\"\n"
     "InputAnalogGunRight2 = \"NONE\"\n"
     "InputAnalogGunUp2 = \"NONE\"\n"
