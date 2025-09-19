@@ -18,10 +18,10 @@ jobs:
       matrix:
         os:
           - ubuntu-latest
-          - windows-latest
+          - windows-2022
           - macos-14
         include:
-          - os: windows-latest
+          - os: windows-2022
             makefile: Makefile.Win32
             outfile_ext: .exe
             shell: msys2 {0}
