@@ -258,7 +258,7 @@ void CCrosshair::Update(uint32_t currentInputs, CInputs* Inputs, unsigned int xO
 
     // Crosshairs can be enabled/disabled at run-tim
     unsigned crosshairs = m_config["Crosshairs"].ValueAs<unsigned>();
-    unsigned borders = m_config["Borders"].ValueAs<unsigned>();
+    unsigned borders = m_config["Border"].ValueAs<unsigned>();
     crosshairs &= 3;
     borders &= 3;
     if (!crosshairs && !borders)

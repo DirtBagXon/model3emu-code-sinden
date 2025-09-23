@@ -983,7 +983,7 @@ int Supermodel(const Game &game, ROMSet *rom_set, IEmulator *Model3, CInputs *In
   gameHasLightguns = !!(game.inputs & (Game::INPUT_GUN1|Game::INPUT_GUN2));
   gameHasLightguns |= game.name == "lostwsga";
   currentInputs = game.inputs;
-  if (gameHasLightguns || s_runtime_config["Borders"].ValueAs<unsigned>()) {
+  if (gameHasLightguns || s_runtime_config["Border"].ValueAs<unsigned>()) {
 #ifdef SUPERMODEL_MANYMOUSE
       if (s_window) SDL_SetWindowGrab(s_window, SDL_TRUE);
 #endif
@@ -1535,7 +1535,6 @@ Util::Config::Node DefaultConfig()
   config.Set("YResolution", 384, "Video");
   config.SetEmpty("WindowXPosition");
   config.SetEmpty("WindowYPosition");
-  config.Set("Borders", int(0));
   config.Set("MouseCursor", true);
   config.Set("FullScreen", false, "Video");
   config.Set("BorderlessWindow", false, "Video");
@@ -1549,6 +1548,7 @@ Util::Config::Node DefaultConfig()
   config.Set("Throttle", true, "Video");
   config.Set("RefreshRate", 60.0f, "Video", 0.0f, 0.0f, { 57.5f,60.f });
   config.Set("ShowFrameRate", false, "Video");
+  config.Set("Border", int(0), "Video", 0, 0, { 0,1,2 });
   config.Set("Crosshairs", int(0), "Video", 0, 0, { 0,1,2,3 });
   config.Set<std::string>("CrosshairStyle", "vector", "Video", "", "", { "bmp","vector" });
   config.Set("NoWhiteFlash", false, "Video");
@@ -1582,9 +1582,6 @@ Util::Config::Node DefaultConfig()
 #endif
 #else
   config.Set<std::string>("InputSystem", "sdl", "Core", "", "", { "sdl","sdlgamepad" });
-#ifdef SUPERMODEL_MANYMOUSE
-  config.Set("ABSMiceOnly", false);
-#endif
   // SDL ForceFeedback
   config.Set("SDLConstForceMax", 100, "ForceFeedback", 0, 100);
   config.Set("SDLSelfCenterMax", 100, "ForceFeedback", 0, 100);
@@ -1594,8 +1591,12 @@ Util::Config::Node DefaultConfig()
 #endif
   config.Set<std::string>("Outputs", "none", "Misc", "", "", { "none","win" });
   config.Set("DumpTextures", false, "Misc");
+  config.Set<std::string>("MultiRomSubGame", "", "Misc", "", "");
+#ifdef SUPERMODEL_MANYMOUSE
+  config.Set("ABSMiceOnly", false, "Misc");
+#endif
 
-   //
+  //
   // Input sensitivity
   //
   config.Set<unsigned>("InputDigitalSensitivity", DEFAULT_DIGITAL_SENSITIVITY, "Sensitivity", 0, 100);
@@ -1722,10 +1723,17 @@ Util::Config::Node DefaultConfig()
   config.Set<std::string>("InputAnalogJoyRight", "KEY_RIGHT", "Input", "", "");
   config.Set<std::string>("InputAnalogJoyUp", "KEY_UP", "Input", "", "");
   config.Set<std::string>("InputAnalogJoyDown", "KEY_DOWN", "Input", "", "");
+#ifdef SUPERMODEL_MANYMOUSE
+  config.Set<std::string>("InputAnalogJoyX", "JOY_XAXIS,MOUSE1_XAXIS", "Input", "", "");
+  config.Set<std::string>("InputAnalogJoyY", "JOY_YAXIS,MOUSE1_YAXIS", "Input", "", "");
+  config.Set<std::string>("InputAnalogJoyTrigger", "KEY_A,JOY_BUTTON1,MOUSE1_LEFT_BUTTON", "Input", "", "");
+  config.Set<std::string>("InputAnalogJoyEvent", "KEY_S,JOY_BUTTON2,MOUSE1_RIGHT_BUTTON", "Input", "", "");
+#else
   config.Set<std::string>("InputAnalogJoyX", "JOY_XAXIS,MOUSE_XAXIS", "Input", "", "");
   config.Set<std::string>("InputAnalogJoyY", "JOY_YAXIS,MOUSE_YAXIS", "Input", "", "");
   config.Set<std::string>("InputAnalogJoyTrigger", "KEY_A,JOY_BUTTON1,MOUSE_LEFT_BUTTON", "Input", "", "");
   config.Set<std::string>("InputAnalogJoyEvent", "KEY_S,JOY_BUTTON2,MOUSE_RIGHT_BUTTON", "Input", "", "");
+#endif
   config.Set<std::string>("InputAnalogJoyTrigger2", "KEY_D,JOY_BUTTON2", "Input", "", "");
   config.Set<std::string>("InputAnalogJoyEvent2", "NONE", "Input", "", "");
 
@@ -1734,19 +1742,33 @@ Util::Config::Node DefaultConfig()
   config.Set<std::string>("InputGunRight", "KEY_RIGHT", "Input", "", "");
   config.Set<std::string>("InputGunUp", "KEY_UP", "Input", "", "");
   config.Set<std::string>("InputGunDown", "KEY_DOWN", "Input", "", "");
+#ifdef SUPERMODEL_MANYMOUSE
+  config.Set<std::string>("InputGunX", "MOUSE1_XAXIS,JOY1_XAXIS", "Input", "", "");
+  config.Set<std::string>("InputGunY", "MOUSE1_YAXIS,JOY1_YAXIS", "Input", "", "");
+  config.Set<std::string>("InputTrigger", "KEY_A,JOY1_BUTTON1,MOUSE1_LEFT_BUTTON", "Input", "", "");
+  config.Set<std::string>("InputOffscreen", "KEY_S,JOY1_BUTTON2,MOUSE1_RIGHT_BUTTON", "Input", "", "");
+#else
   config.Set<std::string>("InputGunX", "MOUSE_XAXIS,JOY1_XAXIS", "Input", "", "");
   config.Set<std::string>("InputGunY", "MOUSE_YAXIS,JOY1_YAXIS", "Input", "", "");
   config.Set<std::string>("InputTrigger", "KEY_A,JOY1_BUTTON1,MOUSE_LEFT_BUTTON", "Input", "", "");
   config.Set<std::string>("InputOffscreen", "KEY_S,JOY1_BUTTON2,MOUSE_RIGHT_BUTTON", "Input", "", "");
+#endif
   config.Set<std::string>("InputAutoTrigger", "0", "Input", "", "");
   config.Set<std::string>("InputGunLeft2", "NONE", "Input", "", "");
   config.Set<std::string>("InputGunRight2", "NONE", "Input", "", "");
   config.Set<std::string>("InputGunUp2", "NONE", "Input", "", "");
   config.Set<std::string>("InputGunDown2", "NONE", "Input", "", "");
+#ifdef SUPERMODEL_MANYMOUSE
+  config.Set<std::string>("InputGunX2", "MOUSE2_XAXIS,JOY2_XAXIS", "Input", "", "");
+  config.Set<std::string>("InputGunY2", "MOUSE2_YAXIS,JOY2_YAXIS", "Input", "", "");
+  config.Set<std::string>("InputTrigger2", "JOY2_BUTTON1,MOUSE2_LEFT_BUTTON", "Input", "", "");
+  config.Set<std::string>("InputOffscreen2", "JOY2_BUTTON2,MOUSE2_RIGHT_BUTTON", "Input", "", "");
+#else
   config.Set<std::string>("InputGunX2", "JOY2_XAXIS", "Input", "", "");
   config.Set<std::string>("InputGunY2", "JOY2_YAXIS", "Input", "", "");
   config.Set<std::string>("InputTrigger2", "JOY2_BUTTON1", "Input", "", "");
   config.Set<std::string>("InputOffscreen2", "JOY2_BUTTON2", "Input", "", "");
+#endif
   config.Set<std::string>("InputAutoTrigger2", "0", "Input", "", "");
 
   // Analog guns (Ocean Hunter, LA Machineguns)
@@ -1754,10 +1776,17 @@ Util::Config::Node DefaultConfig()
   config.Set<std::string>("InputAnalogGunRight", "KEY_RIGHT", "Input", "", "");
   config.Set<std::string>("InputAnalogGunUp", "KEY_UP", "Input", "", "");
   config.Set<std::string>("InputAnalogGunDown", "KEY_DOWN", "Input", "", "");
+#ifdef SUPERMODEL_MANYMOUSE
+  config.Set<std::string>("InputAnalogGunX", "MOUSE1_XAXIS,JOY1_XAXIS", "Input", "", "");
+  config.Set<std::string>("InputAnalogGunY", "MOUSE1_YAXIS,JOY1_YAXIS", "Input", "", "");
+  config.Set<std::string>("InputAnalogTriggerLeft", "KEY_A,JOY1_BUTTON1,MOUSE1_LEFT_BUTTON", "Input", "", "");
+  config.Set<std::string>("InputAnalogTriggerRight", "KEY_S,JOY1_BUTTON2,MOUSE1_RIGHT_BUTTON", "Input", "", "");
+#else
   config.Set<std::string>("InputAnalogGunX", "MOUSE_XAXIS,JOY1_XAXIS", "Input", "", "");
   config.Set<std::string>("InputAnalogGunY", "MOUSE_YAXIS,JOY1_YAXIS", "Input", "", "");
   config.Set<std::string>("InputAnalogTriggerLeft", "KEY_A,JOY1_BUTTON1,MOUSE_LEFT_BUTTON", "Input", "", "");
   config.Set<std::string>("InputAnalogTriggerRight", "KEY_S,JOY1_BUTTON2,MOUSE_RIGHT_BUTTON", "Input", "", "");
+#endif
   config.Set<std::string>("InputAnalogGunLeft2", "NONE", "Input", "", "");
   config.Set<std::string>("InputAnalogGunRight2", "NONE", "Input", "", "");
   config.Set<std::string>("InputAnalogGunUp2", "NONE", "Input", "", "");
@@ -1956,14 +1985,14 @@ static ParsedCommandLine ParseCommandLine(int argc, char **argv)
     { "-ppc-frequency",         "PowerPCFrequency"        },
     { "-crosshairs",            "Crosshairs"              },
     { "-crosshair-style",       "CrosshairStyle"          },
-    { "-borders",               "Borders"                 },
-    { "-sinden",                "Borders"                 },
+    { "-border",                "Border"                  },
+    { "-sinden",                "Border"                  },
     { "-vert-shader",           "VertexShader"            },
     { "-frag-shader",           "FragmentShader"          },
     { "-sound-volume",          "SoundVolume"             },
     { "-music-volume",          "MusicVolume"             },
     { "-balance",               "Balance"                 },
-    { "-channels", 	            "NbSoundChannels"         },
+    { "-channels",              "NbSoundChannels"         },
     { "-soundfreq",             "SoundFreq"               },
     { "-input-system",          "InputSystem"             },
     { "-outputs",               "Outputs"                 },
@@ -2338,6 +2367,8 @@ int main(int argc, char **argv)
         PrintGameList(xml_file, loader.GetGames());
         return 0;
       }
+      if (loadGUI && !config3["MultiRomSubGame"].ValueAs<std::string>().empty())
+          cmd_line.game_name = config3["MultiRomSubGame"].ValueAs<std::string>();
       if (loader.Load(&game, &rom_set, *cmd_line.rom_files.begin(), cmd_line.game_name))
         return 1;
       Util::Config::MergeINISections(&config4, config3, fileConfig[game.name]);   // apply game-specific config
