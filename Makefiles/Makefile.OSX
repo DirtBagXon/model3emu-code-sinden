@@ -60,7 +60,7 @@ LD = clang
 INPUT_CFLAGS = -DSUPERMODEL_MANYMOUSE
 
 SDL_CFLAGS = $(INPUT_CFLAGS)
-SDL_LIBS = -framework SDL2 -framework AGL -framework OpenGL -framework GLUT -framework Cocoa -framework IOKit -framework Carbon
+SDL_LIBS = -framework SDL2 -framework OpenGL -framework GLUT -framework Cocoa -framework IOKit -framework Carbon
 ifeq ($(strip $(NET_BOARD)),1)
 	SDL_LIBS += -framework SDL2_net
 endif
@@ -69,7 +69,7 @@ endif
 #	OSX-specific
 #
 
-PLATFORM_CXXFLAGS = -F./Frameworks $(SDL_CFLAGS) -DSUPERMODEL_OSX
+PLATFORM_CXXFLAGS = -F./Frameworks -IFrameworks/SDL2.framework/Headers $(SDL_CFLAGS) -DSUPERMODEL_OSX
 PLATFORM_LDFLAGS = -F./Frameworks $(SDL_LIBS) -lz -lm -lstdc++ -Wl,-rpath,@executable_path/../Frameworks -Wl,-rpath,@executable_path/Frameworks
 
 
