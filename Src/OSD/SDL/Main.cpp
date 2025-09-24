@@ -1466,7 +1466,7 @@ static std::vector<std::string> ReturnGamesList(const std::map<std::string, Game
 {
     std::vector<std::string> list;
     list.reserve(games.size()+1);
-    list.emplace_back("");
+    list.emplace_back(EMPTY);
 
     for (const auto &v : games)
     {
@@ -1587,14 +1587,6 @@ Util::Config::Node DefaultConfig()
   config.Set("SDLFrictionMax", 100, "ForceFeedback", 0, 100);
   config.Set("SDLVibrateMax", 100, "ForceFeedback", 0, 100);
   config.Set("SDLConstForceThreshold", 30, "ForceFeedback", 0, 100);
-#ifdef NET_BOARD
-  // NetBoard
-  config.Set("Network", false, "Network");
-  config.Set("SimulateNet", true, "Network");
-  config.Set("PortIn", unsigned(1970), "Network");
-  config.Set("PortOut", unsigned(1971), "Network");
-  config.Set<std::string>("AddressOut", "127.0.0.1", "Network", "", "");
-#endif
 #else
   config.Set<std::string>("InputSystem", "sdl", "Core", "", "", { "sdl","sdlgamepad" });
   // SDL ForceFeedback
@@ -1603,6 +1595,14 @@ Util::Config::Node DefaultConfig()
   config.Set("SDLFrictionMax", 100, "ForceFeedback", 0, 100);
   config.Set("SDLVibrateMax", 100, "ForceFeedback", 0, 100);
   config.Set("SDLConstForceThreshold", 30, "ForceFeedback", 0, 100);
+#endif
+#ifdef NET_BOARD
+  // NetBoard
+  config.Set("Network", false, "Network");
+  config.Set("SimulateNet", true, "Network");
+  config.Set("PortIn", unsigned(1970), "Network");
+  config.Set("PortOut", unsigned(1971), "Network");
+  config.Set<std::string>("AddressOut", "127.0.0.1", "Network", "", "");
 #endif
   config.Set<std::string>("Outputs", "none", "Misc", "", "", { "none","win" });
   config.Set("DumpTextures", false, "Misc");
@@ -2386,7 +2386,7 @@ int main(int argc, char **argv)
         PrintGameList(xml_file, loader.GetGames());
         return 0;
       }
-      if (loadGUI && !config3["MergedRom-Game"].ValueAs<std::string>().empty())
+      if (loadGUI && config3["MergedRom-Game"].ValueAs<std::string>() != EMPTY)
         cmd_line.game_name = config3["MergedRom-Game"].ValueAs<std::string>();
       if (loader.Load(&game, &rom_set, *cmd_line.rom_files.begin(), cmd_line.game_name))
         return 1;

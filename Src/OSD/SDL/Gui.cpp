@@ -649,6 +649,13 @@ static void GUI(const ImGuiIO& io, Util::Config::Node& config, const std::map<st
             ImGui::EndTabItem();
             inputs = nullptr;
         }
+        if (ImGui::BeginTabItem("Legacy3D")) {
+            UpdateTempValues(config, "Legacy3D", true);
+            CreateControls(config, "Legacy3D");
+            UpdateTempValues(config, "Legacy3D", false);
+            ImGui::EndTabItem();
+            inputs = nullptr;
+        }
         if (ImGui::BeginTabItem("Audio")) {
             UpdateTempValues(config, "Sound", true);
             CreateControls(config, "Sound");

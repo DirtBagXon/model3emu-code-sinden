@@ -5,6 +5,8 @@
 #include <memory>
 #include <cstdint>
 
+constexpr const char* EMPTY = "<none>";
+
 struct Game
 {
   std::string name;
