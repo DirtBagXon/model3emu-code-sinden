@@ -875,7 +875,7 @@ void EndFrameVideo()
 {
   // Show crosshairs for light gun games
   UpdateVideoInput(currentInputs, videoInputs, s_runtime_config["Crosshairs"].ValueAs<unsigned>(),
-		    s_runtime_config["Borders"].ValueAs<unsigned>());
+		    s_runtime_config["Border"].ValueAs<unsigned>());
 
   // Swap the buffers
   SDL_GL_SwapWindow(s_window);
@@ -986,7 +986,7 @@ int Supermodel(const Game &game, ROMSet *rom_set, IEmulator *Model3, CInputs *In
   gameHasLightguns = !!(game.inputs & (Game::INPUT_GUN1|Game::INPUT_GUN2));
   gameHasLightguns |= game.name == "lostwsga";
   currentInputs = game.inputs;
-  if (gameHasLightguns || s_runtime_config["Borders"].ValueAs<unsigned>())
+  if (gameHasLightguns || s_runtime_config["Border"].ValueAs<unsigned>())
       videoInputs = Inputs;
   else
       videoInputs = NULL;
@@ -1513,7 +1513,7 @@ static Util::Config::Node DefaultConfig()
   config.Set("Throttle", true);
   config.Set("RefreshRate", 60.0f);
   config.Set("ShowFrameRate", false);
-  config.Set("Borders", int(0));
+  config.Set("Border", int(0));
   config.Set("Crosshairs", int(0));
   config.Set("MouseCursor", true);
   config.Set("FlipStereo", false);
@@ -1599,7 +1599,7 @@ static void Help(void)
   puts("  -no-vsync               Do not lock to vertical refresh rate");
   puts("  -true-hz                Use true Model 3 refresh rate of 57.524 Hz");
   puts("  -show-fps               Display frame rate in window title bar");
-  puts("  -borders=<n>            Alias of -sinden=<n>");
+  puts("  -border=<n>             Alias of -sinden=<n>");
   puts("  -sinden=<n>             Sinden border configuration for gun games:");
   puts("                          0=none [Default], 1=standard, 2=wide");
   puts("  -crosshairs=<n>         Crosshairs configuration for gun games:");
@@ -1692,8 +1692,8 @@ static ParsedCommandLine ParseCommandLine(int argc, char **argv)
     { "-load-state",            "InitStateFile"           },
     { "-ppc-frequency",         "PowerPCFrequency"        },
     { "-crosshairs",            "Crosshairs"              },
-    { "-borders",               "Borders"                 },
-    { "-sinden",                "Borders"                 },
+    { "-border",                "Border"                  },
+    { "-sinden",                "Border"                  },
     { "-vert-shader",           "VertexShader"            },
     { "-frag-shader",           "FragmentShader"          },
     { "-vert-shader-fog",       "VertexShaderFog"         },
