@@ -1462,6 +1462,21 @@ static Result ConfigureInputs(CInputs *Inputs, Util::Config::Node *fileConfig, U
   return Result::OKAY;
 }
 
+static std::vector<std::string> ReturnGamesList(const std::map<std::string, Game> &games)
+{
+    std::vector<std::string> list;
+    list.reserve(games.size()+1);
+    list.emplace_back("");
+
+    for (const auto &v : games)
+    {
+        const Game &game = v.second;
+        list.emplace_back("    " + game.name);
+    }
+
+    return list;
+}
+
 // Print game list
 static void PrintGameList(const std::string &xml_file, const std::map<std::string, Game> &games)
 {
@@ -1591,7 +1606,11 @@ Util::Config::Node DefaultConfig()
 #endif
   config.Set<std::string>("Outputs", "none", "Misc", "", "", { "none","win" });
   config.Set("DumpTextures", false, "Misc");
-  config.Set<std::string>("MultiRomSubGame", "", "Misc", "", "");
+
+  GameLoader load(s_gameXMLFilePath);
+  auto game_list = ReturnGamesList(load.GetGames());
+  config.Set<std::string>("MultiRom Game", "", "Misc", "", "", game_list);
+
 #ifdef SUPERMODEL_MANYMOUSE
   config.Set("ABSMiceOnly", false, "Misc");
 #endif
@@ -2367,8 +2386,8 @@ int main(int argc, char **argv)
         PrintGameList(xml_file, loader.GetGames());
         return 0;
       }
-      if (loadGUI && !config3["MultiRomSubGame"].ValueAs<std::string>().empty())
-          cmd_line.game_name = config3["MultiRomSubGame"].ValueAs<std::string>();
+      if (loadGUI && !config3["MultiRom Game"].ValueAs<std::string>().empty())
+        cmd_line.game_name = config3["MultiRom Game"].ValueAs<std::string>();
       if (loader.Load(&game, &rom_set, *cmd_line.rom_files.begin(), cmd_line.game_name))
         return 1;
       Util::Config::MergeINISections(&config4, config3, fileConfig[game.name]);   // apply game-specific config
