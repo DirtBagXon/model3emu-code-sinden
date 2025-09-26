@@ -1566,7 +1566,7 @@ Util::Config::Node DefaultConfig()
   config.Set("Border", int(0), "Video", 0, 0, { 0,1,2 });
   config.Set("Crosshairs", int(0), "Video", 0, 0, { 0,1,2,3 });
   config.Set<std::string>("CrosshairStyle", "vector", "Video", "", "", { "bmp","vector" });
-  config.Set("NoWhiteFlash", false, "Video");
+  config.Set("NoWhiteFlash", true, "Video");
   config.Set("FlipStereo", false, "Sound");
 #ifdef SUPERMODEL_WIN32
   config.Set<std::string>("InputSystem", "dinput", "Core", "", "", { "sdl","sdlgamepad","dinput","xinput","rawinput" });
