@@ -744,7 +744,7 @@ static std::string GetRomPath(int selectedGame, const std::map<std::string, Game
         int index = 0;
         for (auto& g : games) {
             if (selectedGame == index) {
-                return (std::filesystem::path("roms") / (g.second.name + ".zip")).string();        // todo config rom directory? File dialog will be a bit more tricky cross platform but we can specifiy edit box for manual path entry        
+                return (std::filesystem::path("ROMs") / (g.second.name + ".zip")).string();        // todo config rom directory? File dialog will be a bit more tricky cross platform but we can specifiy edit box for manual path entry
             }
             index++;
         }

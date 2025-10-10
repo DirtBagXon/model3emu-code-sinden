@@ -1632,6 +1632,7 @@ Util::Config::Node DefaultConfig()
   //
 
   // Common
+  config.Set<std::string>("InputUIExit", "JOY1_BUTTON10+JOY1_BUTTON9", "Input", "", "");
   config.Set<std::string>("InputStart1", "KEY_1,JOY1_BUTTON9", "Input", "", "");
   config.Set<std::string>("InputStart2", "KEY_2,JOY2_BUTTON9", "Input", "", "");
   config.Set<std::string>("InputCoin1", "KEY_3,JOY1_BUTTON10", "Input", "", "");
