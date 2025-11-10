@@ -8,7 +8,7 @@ This fork uses [ManyMouse](https://github.com/icculus/manymouse) to provide 2 pl
 Two player mouse input in Windows is currently unchanged _(supported in the official release)_ via  
 the Windows Raw Input system.
 
-Better support for MAME style multi ROM sets has also been added.
+Support for MAME multi ROM sets and a `InputUIExit` config parameter have also been added.
 
 This repo will attempt to track the official git repo commits.
 
