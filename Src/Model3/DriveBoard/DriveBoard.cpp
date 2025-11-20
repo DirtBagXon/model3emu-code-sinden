@@ -290,8 +290,8 @@ void CDriveBoard::RunFrame(void)
 
   // Assuming Z80 runs @ 4.0MHz and NMI triggers @ 60.0KHz for WheelBoard and JoystickBoard
   // Assuming Z80 runs @ 8.0MHz and INT triggers @ 60.0KHz for BillBoard
-  // TODO - find out if Z80 frequency is correct and exact frequency of NMI interrupts (just guesswork at the moment!)
-  int cycles = (int)(m_z80Clock * 1000000 / 60);
+
+  int cycles = (int)(m_z80Clock * 1000000 / 57.5);
   constexpr int loopCycles = 10000;
   while (cycles > 0)
   {
