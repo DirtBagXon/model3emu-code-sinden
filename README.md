@@ -1,5 +1,5 @@
 # Supermodel: Sega Model 3 Emulator (Sinden)
-*Copyright 2003-2024 The Supermodel Team*
+*Copyright 2003-2026 The Supermodel Team*
 
 This is a fork of [model3emu-code](https://www.supermodel3.com) to add native **Sinden** light gun support.
 
@@ -30,7 +30,7 @@ For `arm` based systems, clone the `arm` branch:
 
 ## Overview
 
-[Supermodel](https://supermodel3.com) emulates Sega's Model 3 arcade platform, allowing you to relive state-of-the-art 3D arcade gaming as it existed from 1996 through 1999. It uses OpenGL, [SDL2](https://libsdl.org), and can run on Windows, Linux, and macOS. It also supports network play on low-latency network connections. The source code is freely available under the terms of the [GNU General Public License](http://www.gnu.org/copyleft/gpl.html).
+**Supermodel** emulates Sega's Model 3 arcade platform, allowing you to relive state-of-the-art 3D arcade gaming as it existed from 1996 through 1999. It uses OpenGL, [SDL2](https://libsdl.org), and can run on Windows, Linux, and macOS. It also supports network play on low-latency network connections. The source code is freely available under the terms of the [GNU General Public License](http://www.gnu.org/copyleft/gpl.html).
 
 <p align="center">
   <img src="Docs/Images/Daytona2_1.gif" height="250" /> <img src="Docs/Images/LAMachin.gif" height="250" />

@@ -1440,13 +1440,13 @@ static void PrintGameList(const std::string &xml_file, const std::map<std::strin
   }
   printf("Games defined in %s:\n", xml_file.c_str());
   puts("");
-  puts("    ROM Set         Title");
-  puts("    -------         -----");
+  puts("    ROM Set        Title");
+  puts("    -------        -----");
   for (auto &v: games)
   {
     const Game &game = v.second;
     printf("    %s", game.name.c_str());
-    for (int i = game.name.length(); i < 9; i++)  // pad for alignment (no game ID should be more than 9 letters)
+    for (int i = game.name.length(); i < 10; i++)  // pad for alignment
       printf(" ");
     if (!game.version.empty())
       printf("       %s (%s)\n", game.title.c_str(), game.version.c_str());
