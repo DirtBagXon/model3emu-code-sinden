@@ -297,6 +297,9 @@ $(OBJ_DIR)/%.o:	%.cpp
 	$(info Compiling              : $< -> $@)
 	$(SILENT)$(CXX) $(CXXFLAGS) $< -o $@
 
+# Suppress all warnings for third-party packages that we cannot modify
+$(OBJ_DIR)/glew.o: CFLAGS += -w
+
 $(OBJ_DIR)/%.o:	%.c
 	$(info Generating dependencies: $< -> $(OBJ_DIR)/$(*F).d)
 	$(SILENT)$(CC) -MM -MP -MT $(OBJ_DIR)/$(*F).o -MT $(OBJ_DIR)/$(*F).d $(CFLAGS) $< > $(OBJ_DIR)/$(*F).d
