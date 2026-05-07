@@ -76,7 +76,7 @@ jobs:
             mingw64/mingw-w64-x86_64-SDL2
             mingw64/mingw-w64-x86_64-SDL2_net
       - name: Build
-        run: make -f Makefiles/${{ matrix.makefile }} release NET_BOARD=1
+        run: make -f Makefiles/${{ matrix.makefile }} release
       - name: Validate
         run: ${{ matrix.builddir }}/supermodel${{ matrix.outfile_ext }} -print-games
       - name: Create Distributions
