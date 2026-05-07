@@ -60,7 +60,7 @@ LD = clang
 INPUT_CFLAGS = -DSUPERMODEL_MANYMOUSE
 
 SDL_CFLAGS = $(INPUT_CFLAGS)
-SDL_LIBS = -framework SDL2 -framework SDL2_net -framework OpenGL -framework GLUT -framework Cocoa
+SDL_LIBS = -framework SDL2 -framework SDL2_net -framework OpenGL -framework GLUT -framework Cocoa -framework IOKit -framework Carbon
 
 #
 #	OSX-specific
