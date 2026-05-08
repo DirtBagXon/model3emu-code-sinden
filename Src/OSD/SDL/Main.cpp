@@ -1598,13 +1598,13 @@ Util::Config::Node DefaultConfig()
   config.Set("SDLConstForceThreshold", 30, "ForceFeedback", 0, 100);
 #endif
 #ifdef SUPERMODEL_WIN32
-  config.Set<std::string>("Outputs", "none", "Misc", "", "", { "none","win","net" });
+  config.Set<std::string>("Outputs", "none", "Network", "", "", { "none","win","net" });
 #else
-  config.Set<std::string>("Outputs", "none", "Misc", "", "", { "none","net" });
+  config.Set<std::string>("Outputs", "none", "Network", "", "", { "none","net" });
 #endif
-  config.Set<bool>("OutputsWithLF", false, "Misc");
-  config.Set<unsigned int>("OutputsTCPPort", 8000, "Misc", 1024, 65535);
-  config.Set<unsigned int>("OutputsUDPBroadcastPort", 8001, "Misc", 1024, 65535);
+  config.Set<bool>("OutputsWithLF", false, "Network");
+  config.Set<unsigned int>("OutputsTCPPort", 8000, "Network", 1024, 65535);
+  config.Set<unsigned int>("OutputsUDPBroadcastPort", 8001, "Network", 1024, 65535);
 
   config.Set("DumpMemory", false, "Misc");
   config.Set("DumpTextures", false, "Misc");
