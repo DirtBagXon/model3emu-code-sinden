@@ -93,6 +93,10 @@
     "PortIn = 1970\n"
     "PortOut = 1971\n"
     "AddressOut = \"127.0.0.1\"\n"
+    "Outputs = \"none\"\n"
+    "OutputsWithLF = 0\n"
+    "OutputsTCPPort = 8000\n"
+    "OutputsUDPBroadcastPort = 8001\n"
     "\n"
 #ifdef SUPERMODEL_MANYMOUSE
     "; Input\n"
