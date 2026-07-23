@@ -7,3 +7,9 @@ Makefile
 *.zip
 *.nv
 *-release
+Libraries/*
+!Libraries/Get_Libs.cmd
+!Libraries/Get_SDL.cmd
+!Libraries/Get_SDL_Net.cmd
+!Libraries/Get_ZLib.cmd
+
