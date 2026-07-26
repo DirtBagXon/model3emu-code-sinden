@@ -89,7 +89,9 @@
 #include "SDLInputSystem.h"
 #include "SDLIncludes.h"
 #include "Debugger/SupermodelDebugger.h"
+#ifndef SUPERMODEL_OSX
 #include "Graphics/Legacy3D/Legacy3D.h"
+#endif
 #include "Graphics/New3D/New3D.h"
 #include "Model3/IEmulator.h"
 #include "Model3/Model3.h"
@@ -401,7 +403,7 @@ static void PrintGLInfo(bool createScreen, bool infoLog, bool printExtensions)
   unsigned xOffset, yOffset, xRes=496, yRes=384, totalXRes, totalYRes;
   if (createScreen)
   {
-    if (Result::OKAY != CreateGLScreen(false, false, "Supermodel - Querying OpenGL Information...", false, &xOffset, &yOffset, &xRes, &yRes, &totalXRes, &totalYRes, false, false))
+    if (Result::OKAY != CreateGLScreen(s_runtime_config["New3DEngine"].ValueAs<bool>(), s_runtime_config["QuadRendering"].ValueAs<bool>(), "Supermodel - Querying OpenGL Information...", false, &xOffset, &yOffset, &xRes, &yRes, &totalXRes, &totalYRes, false, false))
     {
       ErrorLog("Unable to query OpenGL.\n");
       return;
@@ -704,7 +706,7 @@ static void TestPolygonHeaderBits(IEmulator *Emu)
  Different subsystems output their own blocks.
 ******************************************************************************/
 
-static const int STATE_FILE_VERSION = 5;  // save state file version
+static const int STATE_FILE_VERSION = 6;  // save state file version
 static const int NVRAM_FILE_VERSION = 0;  // NVRAM file version
 static unsigned s_saveSlot = 0;           // save state slot #
 
@@ -1009,7 +1011,12 @@ int Supermodel(const Game &game, ROMSet *rom_set, IEmulator *Model3, CInputs *In
   SuperAA* superAA = new SuperAA(aaValue, CRTcolors);
   superAA->Init(totalXRes, totalYRes);  // pass actual frame sizes here
   CRender2D *Render2D = new CRender2D(s_runtime_config);
+#ifndef SUPERMODEL_OSX
   IRender3D *Render3D = s_runtime_config["New3DEngine"].ValueAs<bool>() ? ((IRender3D *) new New3D::CNew3D(s_runtime_config, Model3->GetGame().name)) : ((IRender3D *) new Legacy3D::CLegacy3D(s_runtime_config));
+#else
+  // Legacy renderer is not supported on Mac, always use new engine
+  IRender3D *Render3D = (IRender3D *) new New3D::CNew3D(s_runtime_config, Model3->GetGame().name);
+#endif
 
   UpscaleMode upscaleMode = (UpscaleMode)s_runtime_config["UpscaleMode"].ValueAs<int>();
 
@@ -1526,9 +1533,11 @@ Util::Config::Node DefaultConfig()
   config.Set("MultiThreaded", true,"Core");
   config.Set("GPUMultiThreaded", true, "Core");
   // 2D and 3D graphics engines
+#ifndef SUPERMODEL_OSX
   config.Set("MultiTexture", false, "Legacy3D");
   config.Set<std::string>("VertexShader", "", "Legacy3D", "", "");
   config.Set<std::string>("FragmentShader", "", "Legacy3D", "", "");
+#endif
   // CSoundBoard
   config.Set("EmulateSound", true, "Sound");
   config.Set("Balance", 0.0f, "Sound", -100.f, 100.f);
@@ -1914,15 +1923,23 @@ static void Help(void)
   puts("  -crosshair-style=<s>    Crosshair style: vector or bmp. [Default: vector]");
   puts("  -sinden=<n>             Sinden border configuration for gun games:");
   puts("                          0=none [Default], 1=standard, 2=wide");
+#ifndef SUPERMODEL_OSX
   puts("  -new3d                  New 3D engine by Ian Curtis [Default]");
+#endif
   puts("  -nomousecursor          Disable desktop mouse cursor in SDL Windowed mode");
   puts("  -quad-rendering         Enable proper quad rendering");
+#ifndef SUPERMODEL_OSX
   puts("  -legacy3d               Legacy 3D engine (faster but less accurate)");
   puts("  -multi-texture          Use 8 texture maps for decoding (legacy engine)");
   puts("  -no-multi-texture       Decode to single texture (legacy engine) [Default]");
+#endif
   puts("  -no-white-flash         Disables white flash when games disable 3D rendering");
-  puts("  -vert-shader=<file>     Load Real3D vertex shader for 3D rendering");
-  puts("  -frag-shader=<file>     Load Real3D fragment shader for 3D rendering");
+#ifndef SUPERMODEL_OSX
+  puts("  -vert-shader=<file>     Load Real3D vertex shader for 3D rendering (legacy");
+  puts("                          engine)");
+  puts("  -frag-shader=<file>     Load Real3D fragment shader for 3D rendering (legacy");
+  puts("                          engine)");
+#endif
   puts("  -print-gl-info          Print OpenGL driver information and quit");
   puts("");
   puts("Audio Options:");
@@ -2037,8 +2054,10 @@ static ParsedCommandLine ParseCommandLine(int argc, char **argv)
     { "-no-stretch",          { "Stretch",          false } },
     { "-wide-bg",             { "WideBackground",   true } },
     { "-no-wide-bg",          { "WideBackground",   false } },
+#ifndef SUPERMODEL_OSX
     { "-no-multi-texture",    { "MultiTexture",     false } },
     { "-multi-texture",       { "MultiTexture",     true } },
+#endif
     { "-throttle",            { "Throttle",         true } },
     { "-no-throttle",         { "Throttle",         false } },
     { "-vsync",               { "VSync",            true } },
@@ -2047,7 +2066,9 @@ static ParsedCommandLine ParseCommandLine(int argc, char **argv)
     { "-no-fps",              { "ShowFrameRate",    false } },
     { "-new3d",               { "New3DEngine",      true } },
     { "-quad-rendering",      { "QuadRendering",    true } },
+#ifndef SUPERMODEL_OSX
     { "-legacy3d",            { "New3DEngine",      false } },
+#endif
     { "-no-flip-stereo",      { "FlipStereo",       false } },
     { "-flip-stereo",         { "FlipStereo",       true } },
     { "-sound",               { "EmulateSound",     true } },
@@ -2352,6 +2373,9 @@ int main(int argc, char **argv)
   }
   if (cmd_line.print_gl_info)
   {
+    // Use command line options so we can select the 3D engine for which to print GL info 
+    Util::Config::MergeINISections(&s_runtime_config, DefaultConfig(), cmd_line.config);
+
     // We must exit after this because CreateGLScreen() is used
     PrintGLInfo(true, false, false);
     return 0;
