@@ -1606,6 +1606,13 @@ Util::Config::Node DefaultConfig()
   config.Set("SDLVibrateMax", 100, "ForceFeedback", 0, 100);
   config.Set("SDLConstForceThreshold", 30, "ForceFeedback", 0, 100);
 #endif
+  // NetBoard
+  config.Set("Network", false, "Network");
+  config.Set("SimulateNet", true, "Network");
+  config.Set("PortIn", unsigned(1970), "Network");
+  config.Set("PortOut", unsigned(1971), "Network");
+  config.Set<std::string>("AddressOut", "127.0.0.1", "Network", "", "");
+
 #ifdef SUPERMODEL_WIN32
   config.Set<std::string>("Outputs", "none", "Network", "", "", { "none","win","net" });
 #else

@@ -998,8 +998,14 @@ bool GameLoader::Load(Game *game, ROMSet *rom_set, const std::string &zipfilenam
   if (LoadZipArchive(&zip, zipfilename))
     return true;
 
-  size_t pos = zipfilename.find_last_of("/\\") + 1;
-  std::string loading = zipfilename.substr(pos, (zipfilename.size() - pos) - 4);
+  size_t pos = zipfilename.find_last_of("/\\");
+  std::string loading = (pos == std::string::npos)
+    ? zipfilename
+    : zipfilename.substr(pos + 1);
+
+  size_t dot = loading.rfind('.');
+  if (dot != std::string::npos)
+    loading.erase(dot);
 
   auto it = m_game_info_by_game.find(loading);
   if (it == m_game_info_by_game.end())
