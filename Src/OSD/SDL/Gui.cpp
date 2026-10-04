@@ -7,6 +7,11 @@
 #include <filesystem>
 #include <memory>
 #include <thread>
+#include <set>
+#include <algorithm>
+#include <cctype>
+#include <chrono>
+#include <system_error>
 #include "GameLoader.h"
 #include "../Pkgs/imgui/imgui.h"
 #include "../Pkgs/imgui/imgui_impl_sdl2.h"
@@ -47,6 +52,137 @@ Quick description on the GUI stuff
  - Per game options. Need some code to get a diff of possible configs I think.
 */
 
+
+// ---------------------------------------------------------------------------------------------------------------
+// ROM folder scan:
+//
+// A game is considered owned if its name is:
+//   1. The name of a .zip file in the ROM folder, or
+//   2. The first directory component of an entry inside one of those .zip files.
+//
+// No ROM filenames, CRCs, XML definitions, etc. are used to determine ownership.
+//
+// Example:
+//
+//   ROMs/scud.zip
+//
+//   scud.zip contains:
+//       scuddx/file1.bin
+//       scuddx/file2.bin
+//       scudplus/file1.bin
+//
+// The owned game names are:
+//       scud
+//       scuddx
+//       scudplus
+//
+// Nested directories do NOT create additional game names. For example:
+//
+//       scudx/subdir/file.bin
+//
+// only contributes "scudx".
+// ---------------------------------------------------------------------------------------------------------------
+
+static const char* kRomDir = "ROMs";            // ROM folder (relative to the working directory).
+
+static std::string ToLowerStr(std::string s)
+{
+    std::transform(s.begin(), s.end(), s.begin(), [](unsigned char c) { return (char)std::tolower(c); });
+    return s;
+}
+
+// Returns the lower case game names represented by all *.zip files in the given directory.
+//
+// Each ZIP contributes:
+//   - its own filename without the .zip extension
+//   - the first directory component of every file stored inside the ZIP
+//
+// Only the first directory component is used. No file names inside the ZIP
+// are themselves considered game names.
+static std::set<std::string> ScanRomZips(const std::string& dir,
+                                          std::set<std::string>& subfolderGames,
+                                          std::map<std::string, std::string>& romPaths)
+{
+    std::set<std::string> found;
+    std::error_code ec;
+
+    for (std::filesystem::directory_iterator it(dir, ec), end; !ec && it != end; it.increment(ec)) {
+        std::error_code ec2;
+
+        if (!it->is_regular_file(ec2)) {
+            continue;
+        }
+
+        if (ToLowerStr(it->path().extension().string()) != ".zip") {
+            continue;
+        }
+
+        const std::string zipGameName = ToLowerStr(it->path().stem().string());
+        const std::string zipPath = it->path().string();
+
+        // The ZIP filename itself is always a game name.
+        found.insert(zipGameName);
+        romPaths[zipGameName] = zipPath;
+
+        // Inspect the contents of the ZIP for additional game names.
+        //
+        // GameLoader already uses minizip for reading ZIP archives, so use
+        // the same API here. This is only an enumeration pass; no ROM data
+        // is opened or extracted.
+        unzFile zf = unzOpen(zipPath.c_str());
+        if (zf == nullptr) {
+            continue;
+        }
+
+        for (int zipErr = unzGoToFirstFile(zf);
+             zipErr == UNZ_OK;
+             zipErr = unzGoToNextFile(zf))
+        {
+            char filename[1024] = {};
+
+            if (unzGetCurrentFileInfo(
+                    zf,
+                    nullptr,
+                    filename,
+                    sizeof(filename),
+                    nullptr,
+                    0,
+                    nullptr,
+                    0) != UNZ_OK)
+            {
+                continue;
+            }
+
+            std::string entryName(filename);
+
+            // ZIP paths conventionally use '/', but accept '\\' as well.
+            const size_t separator = entryName.find_first_of("/\\");
+
+            // An entry without a directory is not a game name.
+            if (separator == std::string::npos || separator == 0) {
+                continue;
+            }
+
+            // Only the first directory component is a game name.
+            //
+            // For:
+            //     game/subdir/rom.bin
+            //
+            // only "game" is added.
+            const std::string gameName = ToLowerStr(entryName.substr(0, separator));
+
+            if (!gameName.empty()) {
+                found.insert(gameName);
+                subfolderGames.insert(gameName);
+                romPaths[gameName] = zipPath;
+            }
+        }
+
+        unzClose(zf);
+    }
+
+    return found;
+}
 
 static void WriteGameNode(Util::Config::Node& baseNode, const Util::Config::Node& diffNode, Util::Config::Node& writeNode, const std::string& group)
 {
@@ -600,26 +736,16 @@ static std::shared_ptr<CInputs> GetInputSystem(Util::Config::Node& config, SDL_W
     return nullptr;
 }
 
-static Game GetGame(const std::map<std::string, Game>& games, int selectedGameIndex)
+static Game GetGame(const std::vector<const Game*>& visibleGames, int selectedGameIndex)
 {
-    Game game;
-
-    if (selectedGameIndex >= 0) {
-
-        int index = 0;
-        for (const auto& g : games) {
-            if (index == selectedGameIndex) {
-                game = g.second;
-                break;
-            }
-            index++;
-        }
+    if (selectedGameIndex >= 0 && selectedGameIndex < (int)visibleGames.size()) {
+        return *visibleGames[selectedGameIndex];
     }
 
-    return game;
+    return Game{};
 }
 
-static void GUI(const ImGuiIO& io, Util::Config::Node& config, const std::map<std::string, Game>& games, int& selectedGameIndex, bool& exit, bool& saveSettings, SDL_Window* window, std::shared_ptr<CInputs>& inputs, KeyBindState& kb)
+static void GUI(const ImGuiIO& io, Util::Config::Node& config, const std::vector<const Game*>& visibleGames, int& selectedGameIndex, bool& exit, bool& saveSettings, SDL_Window* window, std::shared_ptr<CInputs>& inputs, KeyBindState& kb)
 {
     ImVec4 clear_color = ImVec4(0.0f, 0.5f, 192/255.f, 1.00f);
 
@@ -647,13 +773,14 @@ static void GUI(const ImGuiIO& io, Util::Config::Node& config, const std::map<st
         ImGui::TableHeadersRow();
 
         int row = 0;
-        for (const auto& g : games) {
+        for (const Game* game : visibleGames) {
+            const Game& g = *game;
 
             ImGui::TableNextRow();
             ImGui::TableSetColumnIndex(0);
-            ImGui::Text("%s", g.second.title.c_str());
+            ImGui::Text("%s", g.title.c_str());
             ImGui::TableSetColumnIndex(1);
-            if (ImGui::Selectable(g.second.name.c_str(), selectedGameIndex == row, ImGuiSelectableFlags_SpanAllColumns)) {
+            if (ImGui::Selectable(g.name.c_str(), selectedGameIndex == row, ImGuiSelectableFlags_SpanAllColumns)) {
                 selectedGameIndex = row;
             }
 
@@ -662,11 +789,11 @@ static void GUI(const ImGuiIO& io, Util::Config::Node& config, const std::map<st
             }
 
             ImGui::TableSetColumnIndex(2);
-            ImGui::Text("%s", g.second.version.c_str());
+            ImGui::Text("%s", g.version.c_str());
             ImGui::TableSetColumnIndex(3);
-            ImGui::Text("%d", g.second.year);
+            ImGui::Text("%d", g.year);
             ImGui::TableSetColumnIndex(4);
-            ImGui::Text("%s", g.second.stepping.c_str());
+            ImGui::Text("%s", g.stepping.c_str());
 
             row++;
         }
@@ -755,7 +882,7 @@ static void GUI(const ImGuiIO& io, Util::Config::Node& config, const std::map<st
                 inputs = GetInputSystem(config, window);
             }
 
-            auto inputList = inputs->GetGameInputs(GetGame(games,selectedGameIndex));
+            auto inputList = inputs->GetGameInputs(GetGame(visibleGames, selectedGameIndex));
 
             if (ImGui::BeginTable("KeyTable", 3, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg)) {
 
@@ -787,15 +914,15 @@ static void GUI(const ImGuiIO& io, Util::Config::Node& config, const std::map<st
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
-static std::string GetRomPath(int selectedGame, const std::map<std::string, Game>& games)
+static std::string GetRomPath(int selectedGame,
+                               const std::vector<const Game*>& visibleGames,
+                               const std::map<std::string, std::string>& romPaths)
 {
-    if (selectedGame >= 0) {
-        int index = 0;
-        for (auto& g : games) {
-            if (selectedGame == index) {
-                return (std::filesystem::path("ROMs") / (g.second.name + ".zip")).string();        // todo config rom directory? File dialog will be a bit more tricky cross platform but we can specifiy edit box for manual path entry
-            }
-            index++;
+    if (selectedGame >= 0 && selectedGame < (int)visibleGames.size()) {
+        const std::string gameName = ToLowerStr(visibleGames[selectedGame]->name);
+        auto it = romPaths.find(gameName);
+        if (it != romPaths.end()) {
+            return it->second;
         }
     }
 
@@ -890,6 +1017,23 @@ std::vector<std::string> RunGUI(const std::string& configPath, const Util::Confi
     std::string xmlFile = config["GameXMLFile"].ValueAs<std::string>();
     GameLoader loader(xmlFile);
     auto& games = loader.GetGames();
+
+    // Scan the ROM folder once at startup. ownedZips contains only names that
+    // come from ZIP filenames or first-level directories inside those ZIPs.
+    // romPaths maps each owned game to the ZIP that contains it.
+    std::set<std::string> subfolderGames;
+    std::map<std::string, std::string> romPaths;
+    const std::set<std::string> ownedZips = ScanRomZips(kRomDir, subfolderGames, romPaths);
+
+    // Build the actual GUI list from owned games only. This means selection
+    // indices always refer to the visible list, not the complete XML game map.
+    std::vector<const Game*> visibleGames;
+    for (const auto& g : games) {
+        if (ownedZips.count(ToLowerStr(g.second.name)) > 0) {
+            visibleGames.push_back(&g.second);
+        }
+    }
+
     int selectedGame = -1;  // -1 means no selection
     std::vector<std::string> romFiles;
     std::string path;
@@ -913,7 +1057,7 @@ std::vector<std::string> RunGUI(const std::string& configPath, const Util::Confi
             }
         }
 
-        GUI(io, config, games, selectedGame, exit, saveSettings, window, inputs, kb);
+        GUI(io, config, visibleGames, selectedGame, exit, saveSettings, window, inputs, kb);
 
         std::this_thread::sleep_for(std::chrono::milliseconds(5));
 
@@ -924,9 +1068,18 @@ std::vector<std::string> RunGUI(const std::string& configPath, const Util::Confi
         }
     }
 
-    path = GetRomPath(selectedGame, games);
+    path = GetRomPath(selectedGame, visibleGames, romPaths);
     if (!path.empty()) {
         romFiles.emplace_back(path);
+
+        // A game found as a first-level directory inside a ZIP is selected
+        // from that ZIP using Supermodel's -game=<name> argument.
+        if (selectedGame >= 0 && selectedGame < (int)visibleGames.size()) {
+            const std::string gameName = ToLowerStr(visibleGames[selectedGame]->name);
+            if (subfolderGames.count(gameName) > 0) {
+                romFiles.emplace_back("-game=" + visibleGames[selectedGame]->name);
+            }
+        }
     }
     
     if (saveSettings) {

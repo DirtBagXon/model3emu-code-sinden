@@ -1619,9 +1619,9 @@ Util::Config::Node DefaultConfig()
   config.Set("DumpMemory", false, "Misc");
   config.Set("DumpTextures", false, "Misc");
 
-  GameLoader load(s_gameXMLFilePath);
-  auto game_list = ReturnGamesList(load.GetGames());
-  config.Set<std::string>("MergedRom-Game", "", "Core", "", "", game_list);
+//  GameLoader load(s_gameXMLFilePath);
+//  auto game_list = ReturnGamesList(load.GetGames());
+//  config.Set<std::string>("MergedRom-Game", "", "Core", "", "", game_list);
 
 #ifdef SUPERMODEL_MANYMOUSE
   config.Set("ABSMiceOnly", false, "Misc");
@@ -2413,8 +2413,8 @@ int main(int argc, char **argv)
         PrintGameList(xml_file, loader.GetGames());
         return 0;
       }
-      if (loadGUI && config3["MergedRom-Game"].ValueAs<std::string>() != EMPTY)
-        cmd_line.game_name = config3["MergedRom-Game"].ValueAs<std::string>();
+      //if (loadGUI && config3["MergedRom-Game"].ValueAs<std::string>() != EMPTY)
+      //  cmd_line.game_name = config3["MergedRom-Game"].ValueAs<std::string>();
       if (loader.Load(&game, &rom_set, *cmd_line.rom_files.begin(), cmd_line.game_name))
         return 1;
       Util::Config::MergeINISections(&config4, config3, fileConfig[game.name]);   // apply game-specific config
