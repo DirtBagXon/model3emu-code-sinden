@@ -87,7 +87,7 @@ jobs:
       - name: Package
         run: |
           rm -f Config/Supermodel.ini
-          mkdir -p NVRAM Saves GraphicsAnalysis
+          mkdir -p NVRAM Saves ROMs GraphicsAnalysis
           cp Docs/LICENSE.txt Docs/README.txt Docs/FORKINFO.txt .
           cp ${{ matrix.builddir }}/ppcd${{ matrix.outfile_ext }} .
           cp ${{ matrix.builddir }}/supermodel${{ matrix.outfile_ext }} .
