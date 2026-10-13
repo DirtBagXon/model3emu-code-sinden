@@ -56,7 +56,7 @@ jobs:
           curl -sLo SDL2_net.dmg https://github.com/libsdl-org/SDL_net/releases/download/release-2.2.0/SDL2_net-2.2.0.dmg
           hdiutil attach -quiet SDL2.dmg
           hdiutil attach -quiet SDL2_net.dmg
-          mkdir Frameworks
+          mkdir -p Frameworks
           cp -r /Volumes/SDL2/SDL2.framework Frameworks/
           cp -r /Volumes/SDL2_net/SDL2_net.framework Frameworks/
           xattr -dr com.apple.quarantine Frameworks/SDL2.framework
@@ -87,7 +87,7 @@ jobs:
       - name: Package
         run: |
           rm -f Config/Supermodel.ini
-          mkdir NVRAM Saves ROMs GraphicsAnalysis
+          mkdir -p NVRAM Saves ROMs GraphicsAnalysis
           cp Docs/LICENSE.txt Docs/README.txt Docs/FORKINFO.txt .
           cp ${{ matrix.builddir }}/ppcd${{ matrix.outfile_ext }} .
           cp ${{ matrix.builddir }}/supermodel${{ matrix.outfile_ext }} .
