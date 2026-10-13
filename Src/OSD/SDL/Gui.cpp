@@ -123,7 +123,7 @@ static std::set<std::string> ScanRomZips(const std::string& dir,
         // Store the filename; GetRomPath joins it to the configured ROM directory.
         // Keep zipPath here for opening the archive during this scan.
         found.insert(zipGameName);
-        romPaths[zipGameName] = zipFileName;
+        romPaths.emplace(zipGameName, zipFileName);
 
         // Inspect the contents of the ZIP for additional game names.
         //
@@ -175,7 +175,7 @@ static std::set<std::string> ScanRomZips(const std::string& dir,
             if (!gameName.empty()) {
                 found.insert(gameName);
                 subfolderGames.insert(gameName);
-                romPaths[gameName] = zipFileName;
+                romPaths.emplace(gameName, zipFileName);
             }
         }
 
@@ -1063,8 +1063,8 @@ std::vector<std::string> RunGUI(const std::string& configPath, const Util::Confi
     // romPaths maps each owned game to the ZIP that contains it.
     std::set<std::string> subfolderGames;
     std::map<std::string, std::string> romPaths;
-    const std::string romDirectory = config["ROMDirectory"].ValueAs<std::string>();
-    const std::set<std::string> ownedZips = ScanRomZips(romDirectory, subfolderGames, romPaths);
+    std::string romDirectory = config["ROMDirectory"].ValueAs<std::string>();
+    std::set<std::string> ownedZips = ScanRomZips(romDirectory, subfolderGames, romPaths);
 
     // Build the actual GUI list from owned games only. This means selection
     // indices always refer to the visible list, not the complete XML game map.
@@ -1103,6 +1103,30 @@ std::vector<std::string> RunGUI(const std::string& configPath, const Util::Confi
                 }
                 closeRequested = true;
             }
+        }
+
+        // Rescan if the ROM directory setting has changed in the GUI.
+        // Refresh every structure derived from the scan so game selection and
+        // launch paths continue to refer to the current ROM directory.
+        const std::string currentRomDirectory =
+            config["ROMDirectory"].ValueAs<std::string>();
+
+        if (currentRomDirectory != romDirectory) {
+            romDirectory = currentRomDirectory;
+
+            subfolderGames.clear();
+            romPaths.clear();
+            ownedZips = ScanRomZips(romDirectory, subfolderGames, romPaths);
+
+            visibleGames.clear();
+            for (const auto& g : games) {
+                if (ownedZips.count(ToLowerStr(g.second.name)) > 0) {
+                    visibleGames.push_back(&g.second);
+                }
+            }
+
+            // The previously selected index may now refer to a different game.
+            selectedGame = -1;
         }
 
         GUI(io, config, visibleGames, selectedGame, exit, saveSettings, window, inputs, kb, closeRequested, exitPromptOpen);
