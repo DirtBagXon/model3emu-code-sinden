@@ -116,7 +116,9 @@ clean:
 	$(SILENT)echo Cleaning up $(BIN_DIR) and $(OBJ_DIR)...
 	$(SILENT)$(RMDIR) $(BIN_DIR)
 	$(SILENT)$(RMDIR) $(OBJ_DIR)
-
+ifneq ($(WNASPI32_BIN_DIR),$(BIN_DIR))
+	$(SILENT)-$(RMDIR) $(WNASPI32_BIN_DIR)
+endif
 
 ###############################################################################
 # Platform-specific Rules

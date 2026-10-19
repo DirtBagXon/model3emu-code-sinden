@@ -4,6 +4,8 @@ obj
 bin64
 obj64
 Makefile
+*.orig
+*.rej
 *.zip
 *.nv
 *-release

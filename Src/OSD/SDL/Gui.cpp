@@ -1038,7 +1038,7 @@ static void GUI(const ImGuiIO& io, Util::Config::Node& config, const std::vector
         ImGui::TableSetupColumn("Rom Name");
         ImGui::TableSetupColumn("Version");
         ImGui::TableSetupColumn("Year");
-        ImGui::TableSetupColumn("Stepping");
+        ImGui::TableSetupColumn("Hardware");
 
         ImGui::TableHeadersRow();
 
@@ -1063,7 +1063,7 @@ static void GUI(const ImGuiIO& io, Util::Config::Node& config, const std::vector
             ImGui::TableSetColumnIndex(3);
             ImGui::Text("%d", g.year);
             ImGui::TableSetColumnIndex(4);
-            ImGui::Text("%s", g.stepping.c_str());
+            ImGui::Text("%s", Game::SteppingName(g.stepping));
 
             row++;
         }

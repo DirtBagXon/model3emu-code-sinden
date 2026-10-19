@@ -35,6 +35,7 @@ BIN_DIR = bin$(strip $(BITS))
 
 SUPERMODEL_BINARY = supermodel
 DISASSEMBLER_BINARY = ppcd
+POWERPC_DISASSEMBLER_BINARY = ppcd
 
 ###############################################################################
 # Compiler Flags
@@ -116,6 +117,7 @@ SRC_FILES = \
 	Src/Graphics/New3D/TextureBank.cpp \
 	Src/Graphics/FBO.cpp \
 	Src/Graphics/Render2D.cpp \
+	Src/Graphics/Pro1000Render2D.cpp \
 	Src/Graphics/SuperAA.cpp \
 	Src/Model3/TileGen.cpp \
 	Src/Model3/Model3.cpp \
@@ -123,6 +125,9 @@ SRC_FILES = \
 	Src/Pro1000/UART.cpp \
 	Src/Pro1000/8259.cpp \
 	Src/Pro1000/SCANPSC100F.cpp \
+	Src/Pro1000/SCSITCPBridge.cpp \
+	Src/Pro1000/SCSIHostAdapter.cpp \
+	Src/Pro1000/SyntheticSCSIROM.cpp \
 	Src/CPU/PowerPC/ppc.cpp \
 	Src/OSD/SDL/Main.cpp \
 	Src/OSD/SDL/Audio.cpp \
@@ -241,7 +246,7 @@ INCLUDE_DIRS = $(sort $(foreach file,$(SRC_FILES),$(dir	$(file))))
 # and thinks the default target is just one of the object files.
 #
 
-all:	$(BIN_DIR)/$(DISASSEMBLER_BINARY) $(BIN_DIR)/$(SUPERMODEL_BINARY)
+all:   $(BIN_DIR)/$(POWERPC_DISASSEMBLER_BINARY) $(BIN_DIR)/$(SCRIPTS_DISASSEMBLER_BINARY) $(BIN_DIR)/$(SUPERMODEL_BINARY)
 
 #
 # Release targets: used only to create official builds stamped with the Git
