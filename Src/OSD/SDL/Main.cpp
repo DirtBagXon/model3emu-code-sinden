@@ -2384,16 +2384,27 @@ int main(int argc, char **argv)
   if (loadGUI) {
       // Load up what settings we have so far. The complete file is passed to the GUI,
       // which edits only the global section and preserves any game-specific sections.
-      // Editing the game-specific sections themselves is not supported atm but we can
-      // look at this later.
       Util::Config::Node fileConfig("Global");
       Util::Config::FromINIFile(&fileConfig, s_configFilePath);
 
-      cmd_line.rom_files = RunGUI(s_configFilePath, fileConfig);
+      const std::vector<std::string> guiResult =
+          RunGUI(s_configFilePath, fileConfig);
 
-      if (cmd_line.rom_files.empty()) {
-          return 0;
+      cmd_line.rom_files.clear();
+
+      for (const auto& item : guiResult) {
+          if (item.compare(0, 6, "-game=") == 0) {
+              // Pass the selected merged-ROM subgame to GameLoader,
+              // rather than treating the option as another ROM filename.
+              cmd_line.game_name = item.substr(6);
+          }
+          else {
+              cmd_line.rom_files.emplace_back(item);
+          }
       }
+
+      if (cmd_line.rom_files.empty())
+          return 0;
   }
 
   // Create logger as specified by command line
