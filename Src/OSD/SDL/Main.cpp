@@ -1547,6 +1547,7 @@ Util::Config::Node DefaultConfig()
   config["PowerPCFrequency"].GetValue()->GetValueRange()->SetSliderFormat("%u MHz", "Auto"); // 0 = chosen by default game stepping
   config.Set("MultiThreaded", true,"Core");
   config.Set("GPUMultiThreaded", true, "Core");
+  config.Set("IdleSkip", true, "Core");
   config.Set<std::string>("ROMDirectory", FileSystemPath::GetPath(FileSystemPath::ROMs), "Core", "", ""); // where the GUI looks for <romset>.zip
   // 2D and 3D graphics engines
 #ifndef SUPERMODEL_OSX
@@ -1937,6 +1938,8 @@ static void Help(void)
   puts("  -no-threads             Disable multi-threading entirely");
   puts("  -gpu-multi-threaded     Run graphics rendering in separate thread [Default]");
   puts("  -no-gpu-thread          Run graphics rendering in main thread");
+  puts("  -idle-skip              Skip PowerPC idle loops [Default]");
+  puts("  -no-idle-skip           Execute PowerPC idle loops in full");
   puts("  -load-state=<file>      Load save state after starting");
   puts("");
   puts("Video Options:");
@@ -2091,6 +2094,8 @@ static ParsedCommandLine ParseCommandLine(int argc, char **argv)
     { "-no-threads",          { "MultiThreaded",    false } },
     { "-gpu-multi-threaded",  { "GPUMultiThreaded", true } },
     { "-no-gpu-thread",       { "GPUMultiThreaded", false } },
+    { "-idle-skip",           { "IdleSkip",         true } },
+    { "-no-idle-skip",        { "IdleSkip",         false } },
     { "-window",              { "FullScreen",       false } },
     { "-fullscreen",          { "FullScreen",       true } },
     { "-borderless",          { "BorderlessWindow", true } },
