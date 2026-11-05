@@ -3265,7 +3265,7 @@ Result CModel2::Init(const Game &game, const ROMSet &rom_set)
   std::cout << "    ROM Set:        " << game.name << std::endl;
   std::cout << "    Developer:      " << game.manufacturer << std::endl;
   std::cout << "    Year:           " << game.year << std::endl;
-  std::cout << "    Hardware:       " << "Model 2" << std::endl;
+  std::cout << "    Hardware:       " << Game::SteppingName(game.stepping) << std::endl;
   std::cout << std::endl;
 
   InfoLog("Model 2: %s initialized.", m_game.title.c_str());
