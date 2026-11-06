@@ -1779,17 +1779,6 @@ Result CModel1::Init(const Game &game, const ROMSet &rom_set)
     }
   }
 
-  if (!game.version.empty())
-    std::cout << "    Title:          " << game.title << " (" << game.version << ")" << std::endl;
-  else
-    std::cout << "    Title:          " << game.title << std::endl;
-
-  std::cout << "    ROM Set:        " << game.name << std::endl;
-  std::cout << "    Developer:      " << game.manufacturer << std::endl;
-  std::cout << "    Year:           " << game.year << std::endl;
-  std::cout << "    Hardware:       " << Game::SteppingName(game.stepping) << std::endl;
-  std::cout << std::endl;
-
   // Print game information
   std::set<std::string> extra_hw;
   if (m_dsb)

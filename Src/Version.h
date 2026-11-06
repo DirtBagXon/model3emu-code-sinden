@@ -28,8 +28,9 @@
 #ifndef INCLUDED_VERSION_H
 #define INCLUDED_VERSION_H
 
-#ifndef SUPERMODEL_VERSION
-#define SUPERMODEL_VERSION	"0.3a-6582a1f-mm DirtBagXon (Sinden)"
-#endif
+#include <string>
+
+std::string SupermodelVersion();
+
 
 #endif	// INCLUDED_VERSION_H

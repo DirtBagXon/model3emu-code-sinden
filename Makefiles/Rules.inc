@@ -96,6 +96,7 @@ CXXFLAGS_GENERATE_DEPENDENCIES = $(filter-out -c,$(CXXFLAGS))
 SRC_FILES = \
 	Src/CPU/PowerPC/PPCDisasm.cpp \
 	Src/BlockFile.cpp \
+	Src/Version.cpp \
 	Src/Pkgs/unzip.cpp \
 	Src/Pkgs/ioapi.cpp \
 	Src/Model3/93C46.cpp \
@@ -335,6 +336,11 @@ $(OBJ_DIR)/%.o:	%.cpp
 	$(SILENT)$(CXX) -MM -MP -MT $(OBJ_DIR)/$(*F).o -MT $(OBJ_DIR)/$(*F).d $(CXXFLAGS_GENERATE_DEPENDENCIES) $< > $(OBJ_DIR)/$(*F).d
 	$(info Compiling              : $< -> $@)
 	$(SILENT)$(CXX) $(CXXFLAGS) $< -o $@
+
+# Always recompile so that __DATE__ in Version.cpp is the date of the build
+.PHONY: FORCE
+FORCE:
+$(OBJ_DIR)/Version.o: FORCE
 
 # Suppress all warnings for third-party packages that we cannot modify
 $(OBJ_DIR)/glew.o: CFLAGS += -w

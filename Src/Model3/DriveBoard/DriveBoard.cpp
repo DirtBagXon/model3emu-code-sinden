@@ -351,26 +351,26 @@ void CDriveBoard::RunFrame(void)
 
   while (frameCycles > 0)
   {
-	if (m_allowNMIInterupts) {
-	    int cycles = m_z80.Run(std::min<int>(frameCycles, m_nmiTimerVal));
-	    frameCycles   -= cycles;
-	    m_nmiTimerVal -= cycles;
-	}
-	else {
-	    int cycles = m_z80.Run(frameCycles);
-	    frameCycles -= cycles;
-	}
+      if (m_allowNMIInterupts) {
+          int cycles = m_z80.Run(std::min<int>(frameCycles, m_nmiTimerVal));
+          frameCycles   -= cycles;
+          m_nmiTimerVal -= cycles;
+      }
+      else {
+          int cycles = m_z80.Run(frameCycles);
+          frameCycles -= cycles;
+      }
 
-	if (m_allowNMIInterupts && m_nmiTimerVal <= 0) {
+      if (m_allowNMIInterupts && m_nmiTimerVal <= 0) {
 
-	    // fire nmi
-	    m_z80.TriggerNMI();
+          // fire nmi
+          m_z80.TriggerNMI();
 
-	    int freq = (int)m_z80Clock * 1000000;
+          int freq = (int)m_z80Clock * 1000000;
 
-	    // reset timer
-	    m_nmiTimerVal = freq / m_z80CTC.CalcFrequency(1, freq);
-	}
+          // reset timer
+          m_nmiTimerVal = freq / m_z80CTC.CalcFrequency(1, freq);
+      }
   }
 }
 

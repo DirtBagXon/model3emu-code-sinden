@@ -776,6 +776,40 @@ bool CSDLInputSystem::Poll()
   m_keyState = SDL_GetKeyboardState(nullptr);
 
 #ifdef SUPERMODEL_MANYMOUSE
+  // Alt+M toggles SDL mouse capture. Use the key-down edge so holding the
+  // shortcut does not repeatedly toggle capture.
+  {
+    static bool altMWasDown = false;
+    static bool captureStateInitialized = false;
+    static bool mouseCaptured = false;
+
+    const Uint8 *keyboardState = SDL_GetKeyboardState(nullptr);
+    const SDL_Keymod modifiers = SDL_GetModState();
+    const bool altMDown =
+        keyboardState[SDL_SCANCODE_M] &&
+        (modifiers & KMOD_ALT) != 0;
+
+    if (!captureStateInitialized) {
+      SDL_Window *window = SDL_GetKeyboardFocus();
+      if (window) {
+        mouseCaptured = SDL_GetWindowGrab(window) == SDL_TRUE;
+        captureStateInitialized = true;
+      }
+    }
+
+    if (altMDown && !altMWasDown) {
+      SDL_Window *window = SDL_GetKeyboardFocus();
+      if (window) {
+        mouseCaptured = !mouseCaptured;
+        SDL_SetWindowGrab(window, mouseCaptured ? SDL_TRUE : SDL_FALSE);
+        SDL_ShowCursor(mouseCaptured ? SDL_DISABLE : SDL_ENABLE);
+        captureStateInitialized = true;
+      }
+    }
+
+    altMWasDown = altMDown;
+  }
+
   // Get mouse states from ManyMouse...
   while (ManyMouse_PollEvent(&mm_event)) {
 
