@@ -1,6 +1,6 @@
 /**
  ** Supermodel
- ** A Sega Model 3 Arcade Emulator.
+ ** A Sega Model Series Arcade Emulator.
  ** Copyright 2011-2012 Bart Trzynadlowski, Nik Henson
  **
  ** This file is part of Supermodel.
@@ -29,7 +29,7 @@
 #define INCLUDED_VERSION_H
 
 #ifndef SUPERMODEL_VERSION
-#define SUPERMODEL_VERSION	"0.3a-1b4b752-mm DirtBagXon (Sinden)"
+#define SUPERMODEL_VERSION	"0.3a-6582a1f-mm DirtBagXon (Sinden)"
 #endif
 
 #endif	// INCLUDED_VERSION_H

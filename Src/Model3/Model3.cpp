@@ -3292,8 +3292,9 @@ Result CModel3::Init(const Game &game, const ROMSet &rom_set)
   std::cout << "    Year:           " << game.year << std::endl;
   std::cout << "    Hardware:       " << Game::SteppingName(game.stepping) << std::endl;
   std::cout << "    3D Engine:      " << engine_type << std::endl;
-  if (!extra_hw.empty())
-    std::cout << "    Extra Hardware: " << Util::Format(", ").Join(extra_hw) << std::endl;
+  if (extra_hw.empty())
+      extra_hw.insert("None");
+  std::cout << "    Extra Hardware: " << Util::Format(", ").Join(extra_hw) << std::endl;
   std::cout << std::endl;
 
   m_game = game;
