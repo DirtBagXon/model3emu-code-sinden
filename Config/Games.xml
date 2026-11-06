@@ -2349,6 +2349,16 @@
         <file offset="0x000000" name="mpr-20484.22" crc32="0x8AC3FBC4" />
         <file offset="0x400000" name="mpr-20485.24" crc32="0xCFD8C19B" />
       </region>
+      <!-- DSB2 ROMs not dumped: the Twin's, when they are there -->
+      <region name="mpeg_program" stride="1" chunk_size="1" byte_swap="true" required="false" merge="false">
+        <file offset="0" name="epr-20641.2" crc32="0xC9B82035" />
+      </region>
+      <region name="mpeg_music" stride="1" chunk_size="1" required="false" merge="false">
+        <file offset="0x000000" name="mpr-20637.57" crc32="0xD66E8A02" />
+        <file offset="0x400000" name="mpr-20638.58" crc32="0xD1513382" />
+        <file offset="0x800000" name="mpr-20639.59" crc32="0xF6603B7B" />
+        <file offset="0xC00000" name="mpr-20640.60" crc32="0x9EEA07B7" />
+      </region>
     </roms>
   </game>
 
@@ -2364,6 +2374,7 @@
     <hardware>
       <platform>Sega Model 2</platform>
       <stepping>2</stepping>
+      <drive_board>Wheel</drive_board>
       <inputs>
         <input type="common" />
         <input type="vehicle" />
@@ -2435,6 +2446,9 @@
         <file offset="0x0000000" name="opr-14742a.45" crc32="0x90C6B117" />
         <file offset="0x0000002" name="opr-14743a.46" crc32="0xAE7F446B" />
       </region>
+      <region name="driveboard_program" stride="1" chunk_size="1" required="false">
+        <file offset="0" name="epr-16488a.ic12" crc32="0x546C5D1A" />
+      </region>
     </roms>
   </game>
   <game name="daytonase" parent="daytona">
@@ -2447,6 +2461,7 @@
     <hardware>
       <platform>Sega Model 2</platform>
       <stepping>2</stepping>
+      <drive_board>Wheel</drive_board>
       <inputs>
         <input type="common" />
         <input type="vehicle" />
@@ -2529,6 +2544,7 @@
     <hardware>
       <platform>Sega Model 2</platform>
       <stepping>2</stepping>
+      <drive_board>Wheel</drive_board>
       <inputs>
         <input type="common" />
         <input type="vehicle" />
@@ -2542,7 +2558,7 @@
         <file offset="0x0000000" name="epr-16530a.12" crc32="0x39E962B5" />
         <file offset="0x0000002" name="epr-16531a.13" crc32="0x693126EB" />
       </region>
-      <region name="main_data" stride="4" chunk_size="2">
+      <region name="main_data" stride="4" chunk_size="2" merge="false">
         <file offset="0x0000000" name="mpr-16528.10" crc32="0x9CE591F6" />
         <file offset="0x0000002" name="mpr-16529.11" crc32="0xF7095EAF" />
         <file offset="0x0400000" name="mpr-16526.8" crc32="0x5273B8B5" />
@@ -2598,6 +2614,7 @@
     <hardware>
       <platform>Sega Model 2</platform>
       <stepping>2</stepping>
+      <drive_board>Wheel</drive_board>
       <inputs>
         <input type="common" />
         <input type="vehicle" />
@@ -2681,6 +2698,7 @@
     <hardware>
       <platform>Sega Model 2</platform>
       <stepping>2</stepping>
+      <drive_board>Wheel</drive_board>
       <inputs>
         <input type="common" />
         <input type="vehicle" />
@@ -2764,6 +2782,7 @@
     <hardware>
       <platform>Sega Model 2</platform>
       <stepping>2</stepping>
+      <drive_board>Wheel</drive_board>
       <inputs>
         <input type="common" />
         <input type="vehicle" />
@@ -2847,6 +2866,7 @@
     <hardware>
       <platform>Sega Model 2</platform>
       <stepping>2</stepping>
+      <drive_board>Wheel</drive_board>
       <inputs>
         <input type="common" />
         <input type="vehicle" />
@@ -2931,6 +2951,7 @@
     <hardware>
       <platform>Sega Model 2</platform>
       <stepping>2</stepping>
+      <drive_board>Wheel</drive_board>
       <inputs>
         <input type="common" />
         <input type="vehicle" />
@@ -3584,6 +3605,9 @@
         <file offset="0x0000000" name="opr-14742a.45" crc32="0x90C6B117" />
         <file offset="0x0000002" name="opr-14743a.46" crc32="0xAE7F446B" />
       </region>
+      <!-- Twin: no Model 1 sound board (the DX's) -->
+      <region name="m1_sound_program" stride="1" chunk_size="1" merge="false" />
+      <region name="mpcm1" stride="1" chunk_size="1" merge="false" />
     </roms>
   </game>
   <game name="manxttdx" parent="manxtt">
@@ -3673,6 +3697,7 @@
     <hardware>
       <platform>Sega Model 2</platform>
       <stepping>2A</stepping>
+      <drive_board>Wheel</drive_board>
       <inputs>
         <input type="common" />
         <input type="vehicle" />
@@ -3721,6 +3746,9 @@
         <file offset="0x0000000" name="opr-14742a.45" crc32="0x90C6B117" />
         <file offset="0x0000002" name="opr-14743a.46" crc32="0xAE7F446B" />
       </region>
+      <region name="driveboard_program" stride="1" chunk_size="1" required="false">
+        <file offset="0" name="epr-17891.ic12" crc32="0x9A33B437" />
+      </region>
     </roms>
   </game>
   <game name="srallycb" parent="srallyc">
@@ -3733,6 +3761,7 @@
     <hardware>
       <platform>Sega Model 2</platform>
       <stepping>2A</stepping>
+      <drive_board>Wheel</drive_board>
       <inputs>
         <input type="common" />
         <input type="vehicle" />
@@ -3793,6 +3822,7 @@
     <hardware>
       <platform>Sega Model 2</platform>
       <stepping>2A</stepping>
+      <drive_board>Wheel</drive_board>
       <inputs>
         <input type="common" />
         <input type="vehicle" />
@@ -3853,6 +3883,7 @@
     <hardware>
       <platform>Sega Model 2</platform>
       <stepping>2A</stepping>
+      <drive_board>Wheel</drive_board>
       <inputs>
         <input type="common" />
         <input type="vehicle" />
@@ -3891,7 +3922,7 @@
       <region name="sound_program" stride="1" chunk_size="1">
         <file offset="0x0000000" name="epr-17763.30" crc32="0xB490028E" />
       </region>
-      <region name="samples" stride="1" chunk_size="1">
+      <region name="samples" stride="1" chunk_size="1" merge="false">
         <file offset="0x0000000" name="mpr-17756.31" crc32="0x7725F111" />
         <file offset="0x0200000" name="mpr-17757.32" crc32="0x1616E649" />
         <file offset="0x0400000" name="mpr-17758.36" crc32="0x47E0FA82" />
@@ -3899,6 +3930,9 @@
       <region name="copro_tables" stride="4" chunk_size="2">
         <file offset="0x0000000" name="opr-14742a.45" crc32="0x90C6B117" />
         <file offset="0x0000002" name="opr-14743a.46" crc32="0xAE7F446B" />
+      </region>
+      <region name="driveboard_program" stride="1" chunk_size="1" required="false">
+        <file offset="0" name="epr-17182.ic12" crc32="0x08D3DB42" />
       </region>
     </roms>
   </game>
@@ -3911,6 +3945,7 @@
     <hardware>
       <platform>Sega Model 2</platform>
       <stepping>2A</stepping>
+      <drive_board>Wheel</drive_board>
       <inputs>
         <input type="common" />
         <input type="vehicle" />
@@ -3949,7 +3984,7 @@
       <region name="sound_program" stride="1" chunk_size="1">
         <file offset="0x0000000" name="epr-17763.30" crc32="0xB490028E" />
       </region>
-      <region name="samples" stride="1" chunk_size="1">
+      <region name="samples" stride="1" chunk_size="1" merge="false">
         <file offset="0x0000000" name="mpr-17756.31" crc32="0x7725F111" />
         <file offset="0x0200000" name="mpr-17757.32" crc32="0x1616E649" />
         <file offset="0x0400000" name="mpr-17758.36" crc32="0x47E0FA82" />
@@ -3957,6 +3992,9 @@
       <region name="copro_tables" stride="4" chunk_size="2">
         <file offset="0x0000000" name="opr-14742a.45" crc32="0x90C6B117" />
         <file offset="0x0000002" name="opr-14743a.46" crc32="0xAE7F446B" />
+      </region>
+      <region name="driveboard_program" stride="1" chunk_size="1" required="false">
+        <file offset="0" name="epr-17182.ic12" crc32="0x08D3DB42" />
       </region>
     </roms>
   </game>
@@ -5008,6 +5046,8 @@
         <file offset="0x0400000" name="mpr-20814.36" crc32="0xE8EBC74C" />
         <file offset="0x0600000" name="mpr-20815.37" crc32="0x1B5AAAE4" />
       </region>
+      <!-- Model 2B/2C: no TGP tables -->
+      <region name="copro_tables" stride="4" chunk_size="2" merge="false" />
     </roms>
   </game>
   <game name="dyndeka2b" parent="dynamcop">
@@ -5070,6 +5110,8 @@
         <file offset="0x0400000" name="mpr-20814.36" crc32="0xE8EBC74C" />
         <file offset="0x0600000" name="mpr-20815.37" crc32="0x1B5AAAE4" />
       </region>
+      <!-- Model 2B/2C: no TGP tables -->
+      <region name="copro_tables" stride="4" chunk_size="2" merge="false" />
     </roms>
   </game>
   <game name="dynamcopc" parent="dynamcop">
@@ -5132,6 +5174,8 @@
         <file offset="0x0400000" name="mpr-20814.36" crc32="0xE8EBC74C" />
         <file offset="0x0600000" name="mpr-20815.37" crc32="0x1B5AAAE4" />
       </region>
+      <!-- Model 2B/2C: no TGP tables -->
+      <region name="copro_tables" stride="4" chunk_size="2" merge="false" />
     </roms>
   </game>
   <game name="pltkids">
@@ -5847,6 +5891,7 @@
     <hardware>
       <platform>Sega Model 2</platform>
       <stepping>2B</stepping>
+      <drive_board>Wheel</drive_board>
       <inputs>
         <input type="common" />
         <input type="vehicle" />
@@ -5921,6 +5966,9 @@
         <file offset="0x0400000" name="mpr-18243.34" crc32="0xA00A0053" />
         <file offset="0x0600000" name="mpr-18244.35" crc32="0xBFA75BEB" />
       </region>
+      <region name="driveboard_program" stride="1" chunk_size="1" required="false">
+        <file offset="0" name="epr-18261.ic9" crc32="0x0C7FAC58" />
+      </region>
     </roms>
   </game>
   <game name="indy500d" parent="indy500">
@@ -5933,6 +5981,7 @@
     <hardware>
       <platform>Sega Model 2</platform>
       <stepping>2B</stepping>
+      <drive_board>Wheel</drive_board>
       <inputs>
         <input type="common" />
         <input type="vehicle" />
@@ -6019,6 +6068,7 @@
     <hardware>
       <platform>Sega Model 2</platform>
       <stepping>2B</stepping>
+      <drive_board>Wheel</drive_board>
       <inputs>
         <input type="common" />
         <input type="vehicle" />
@@ -6629,6 +6679,7 @@
     <hardware>
       <platform>Sega Model 2</platform>
       <stepping>2B</stepping>
+      <drive_board>Wheel</drive_board>
       <inputs>
         <input type="common" />
         <input type="vehicle" />
@@ -6661,6 +6712,9 @@
       </region>
       <region name="samples" stride="1" chunk_size="1">
         <file offset="0x0000000" name="mpr-19154.32" crc32="0x7CD9E679" />
+      </region>
+      <region name="driveboard_program" stride="1" chunk_size="1" required="false">
+        <file offset="0" name="epr-18261.ic9" crc32="0x0C7FAC58" />
       </region>
     </roms>
   </game>
@@ -6908,6 +6962,7 @@
     <hardware>
       <platform>Sega Model 2</platform>
       <stepping>2C</stepping>
+      <drive_board>Wheel</drive_board>
       <inputs>
         <input type="common" />
         <input type="vehicle" />
@@ -6942,6 +6997,9 @@
         <file offset="0x0000000" name="mpr-20003.32" crc32="0x149AC22B" />
         <file offset="0x0400000" name="mpr-20004.34" crc32="0x0B9C5410" />
       </region>
+      <region name="driveboard_program" stride="1" chunk_size="1" required="false">
+        <file offset="0" name="epr-18261.ic9" crc32="0x0C7FAC58" />
+      </region>
     </roms>
   </game>
   <game name="overrevb" parent="overrev">
@@ -6954,6 +7012,7 @@
     <hardware>
       <platform>Sega Model 2</platform>
       <stepping>2B</stepping>
+      <drive_board>Wheel</drive_board>
       <inputs>
         <input type="common" />
         <input type="vehicle" />
@@ -7000,6 +7059,7 @@
     <hardware>
       <platform>Sega Model 2</platform>
       <stepping>2B</stepping>
+      <drive_board>Wheel</drive_board>
       <inputs>
         <input type="common" />
         <input type="vehicle" />
@@ -7097,6 +7157,7 @@
     <hardware>
       <platform>Sega Model 2</platform>
       <stepping>2C</stepping>
+      <drive_board>Wheel</drive_board>
       <inputs>
         <input type="common" />
         <input type="vehicle" />
@@ -7192,6 +7253,9 @@
         <file offset="0x0400000" name="mpr-19264.59s" crc32="0xB6C51D0F" />
         <file offset="0x0600000" name="mpr-19265.60s" crc32="0x7D98700A" />
       </region>
+      <region name="driveboard_program" stride="1" chunk_size="1" required="false">
+        <file offset="0" name="epr-18261.ic9" crc32="0x0C7FAC58" />
+      </region>
     </roms>
   </game>
   <game name="stccb" parent="stcc">
@@ -7204,6 +7268,7 @@
     <hardware>
       <platform>Sega Model 2</platform>
       <stepping>2C</stepping>
+      <drive_board>Wheel</drive_board>
       <inputs>
         <input type="common" />
         <input type="vehicle" />
@@ -7311,6 +7376,7 @@
     <hardware>
       <platform>Sega Model 2</platform>
       <stepping>2C</stepping>
+      <drive_board>Wheel</drive_board>
       <inputs>
         <input type="common" />
         <input type="vehicle" />
@@ -7417,6 +7483,7 @@
     <hardware>
       <platform>Sega Model 2</platform>
       <stepping>2C</stepping>
+      <drive_board>Wheel</drive_board>
       <inputs>
         <input type="common" />
         <input type="vehicle" />
@@ -7874,11 +7941,11 @@
       </inputs>
     </hardware>
     <roms>
-      <region name="program" stride="4" chunk_size="2">
+      <region name="program" stride="4" chunk_size="2" merge="false">
         <file offset="0x0000000" name="prg0.15" crc32="0x548ED10A" />
         <file offset="0x0000002" name="prg1.16" crc32="0xF43BB51F" />
       </region>
-      <region name="main_data" stride="4" chunk_size="2">
+      <region name="main_data" stride="4" chunk_size="2" merge="false">
         <file offset="0x0000000" name="dat0.11" crc32="0x8D40FC82" />
         <file offset="0x0000002" name="dat1.12" crc32="0x63E04C15" />
         <file offset="0x0800000" name="dat2.9" crc32="0x2AA9E4B9" />
@@ -7890,7 +7957,7 @@
         <file offset="0x0000000" name="copro0.29" crc32="0xFC2380F5" />
         <file offset="0x0000002" name="copro1.30" crc32="0xE6AE8F3C" />
       </region>
-      <region name="polygons" stride="4" chunk_size="2">
+      <region name="polygons" stride="4" chunk_size="2" merge="false">
         <file offset="0x0000000" name="tgp0.17" crc32="0xB458EC9B" />
         <file offset="0x0000002" name="tgp1.21" crc32="0x4B250500" />
         <file offset="0x0800000" name="tgp2.18" crc32="0x17F68D25" />
@@ -8587,7 +8654,7 @@
         <file offset="4" name="epr-crom2.18" crc32="0xE4147534" />
         <file offset="6" name="epr-crom3.17" crc32="0x84734E94" />
       </region>
-      <region name="banked_crom" stride="8" chunk_size="2" byte_swap="true">
+      <region name="banked_crom" stride="8" chunk_size="2" byte_swap="true" merge="false">
         <!-- CROM0 -->
         <file offset="0x0000000" name="epr-crom00.04" crc32="0xDC0D974D" />
         <file offset="0x0000002" name="epr-crom01.03" crc32="0x4D13685D" />

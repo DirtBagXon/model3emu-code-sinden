@@ -65,6 +65,7 @@
 #include "Model2/Model2Video.h"
 #include "Model2/Model2Comm.h"
 #include "Model2/Sega315_5838.h"
+#include "Model2/Model2DriveBoard.h"
 #include "Model3/Crypto.h"
 #include "Model1/I8251.h"
 #include "Graphics/Model1Render.h"
@@ -158,6 +159,11 @@ private:
 
   uint32_t ReadDword(uint32_t addr, uint32_t mask);
   void WriteDword(uint32_t addr, uint32_t data, uint32_t mask);
+  int  AreaWaits(uint32_t addr) const;
+  void ChargeWaits(uint32_t addr) { m_i960.AddWaitCycles(AreaWaits(addr) * CYCLES_PER_WAIT); }
+  // i960 cycles per programmed wait state, as sm2-emu (fitted to hardware
+  // captures). Sega Rally's rival cars start in the wrong places below 3.
+  static constexpr int CYCLES_PER_WAIT = 3;
 
   // Coprocessor
   uint32_t FIFOPop(CFIFO &fifo, CPUID reader, CPUID writer);
@@ -344,6 +350,13 @@ private:
   uint16_t  m_gun[4] = { 0x0e9, 0x180, 0x0e9, 0x17b };   // light guns (MAME's P1_Y, P1_X, P2_Y, P2_X)
   uint8_t   m_gunOffscreen = 0;                          // bit 0: P1, bit 1: P2
   uint8_t   m_lightgunMux = 0;                           // MAME's m_lightgun_mux (serial channel 2)
+  // The racing games' wheel drive board (force feedback), when its ROM is
+  // there and force feedback is on: Daytona's and Sega Rally's
+  // (CModel2DriveBoard), or the 2B/2C games' EPR-18261 board
+  // (CModel2DirectDriveBoard), which answers on port D
+  std::unique_ptr<CDriveBoard> m_wheelBoard;
+  std::vector<uint8_t> m_wheelBoardROM;
+  bool      m_wheelBoardReplies = false;
   bool      m_rchase2Drive = false;                      // Rail Chase 2's drive board on port D/E (MAME's simulation)
 
   // Drive board (Sega Ski Super G's ski board, Manx TT DX's motion slider),

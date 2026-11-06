@@ -904,7 +904,10 @@ uint8_t CModel2::IORead(unsigned offset)
       {
       case 1:  return In0Read();    // port B
       case 2:  return m_in[1];      // port C
-      case 3:  return m_driveBoard.present ? DriveBoardRead() : m_rchase2Drive ? RailChase2DriveRead() : m_in[2];   // port D (or the drive board)
+      case 3:                       // port D (or the drive board)
+        if (m_wheelBoardReplies)
+          return m_wheelBoard->Read();
+        return m_driveBoard.present ? DriveBoardRead() : m_rchase2Drive ? RailChase2DriveRead() : m_in[2];
       case 6:  return 0xFF;         // port G: DIP switches
       default: return 0xFF;
       }
@@ -942,6 +945,8 @@ void CModel2::IOWrite(unsigned offset, uint8_t data)
       EEPROMWrite(data);            // port A
     else if (offset == 4 && m_driveBoard.present)
       DriveBoardWrite(data);        // port E: drive board command
+    else if (offset == 4 && m_wheelBoard)
+      m_wheelBoard->Write(data);    // port E: wheel drive board command
     // port E: billboard / drive board, port F: lamps and coin counters
     break;
   case 0x08:
@@ -1420,6 +1425,9 @@ void CModel2::WriteDword(uint32_t addr, uint32_t data, uint32_t mask)
       m_dpram[i] = uint8_t(data);
     if (mask & 0x00ff0000)
       m_dpram[i + 1] = uint8_t(data >> 16);
+    // byte 11: the drive board command, which the I/O board passes on (its port E)
+    if (m_wheelBoard && ((i == 0x11 && (mask & 0x000000ff)) || (i + 1 == 0x11 && (mask & 0x00ff0000))))
+      m_wheelBoard->Write(m_dpram[0x11]);
     return;
   }
   if (addr >= 0x01c00000 && addr < 0x01c00020)
@@ -1526,37 +1534,78 @@ void CModel2::WriteDword(uint32_t addr, uint32_t data, uint32_t mask)
     DebugLog("Model 2: unmapped write %08X = %08X & %08X (PC %08X)\n", addr, data, mask, m_i960.GetPIP());
 }
 
+// The board's wait states: the program writes Sega's area wait table (one word
+// per memory area at 0xE00000: 01/02/04/08/10 = 0-4 waits, 20 = the device
+// signals ready itself, bit 6 = DRAM) and each i960 data access to an area is
+// stretched by its waits. Opcode fetches aren't charged (the i960KB's
+// instruction cache), nor DRAM (page mode hits). The areas as sm2-emu's
+// model2_area_timing.h, from Sega's table.
+int CModel2::AreaWaits(uint32_t addr) const
+{
+  unsigned offset;
+  if (addr < 0x00200000)                                offset = 0x00;   // program ROM
+  else if (addr >= 0x00500000 && addr < 0x00600000)     offset = 0x08;   // work RAM
+  else if (addr >= 0x00900000 && addr < 0x00980000)     offset = 0x04;   // buffer RAM
+  else if (addr >= 0x01800000 && addr < 0x0181c000)     offset = 0x1c;   // palette, colour tables
+  else if (addr >= 0x01a00000 && addr < 0x01a20000)     offset = 0x20;   // comm board
+  else if (addr >= 0x01c00000 && addr < 0x01c80000)     offset = 0x24;   // I/O
+  else if (addr >= 0x01c80000 && addr < 0x01d00000)     offset = 0x28;   // sound
+  else if (addr >= 0x01d00000 && addr < 0x01d80000)     offset = 0x2c;   // backup RAM
+  else if (addr >= 0x01d80000 && addr < 0x01e00000)     offset = 0x30;   // security
+  else if ((addr >= 0x02000000 && addr < 0x04000000) || (addr >= 0x06000000 && addr < 0x07000000))
+    offset = 0x34;                                                        // data ROM
+  else
+    return 0;
+  uint8_t setting = m_waitStateRAM[offset];               // little endian: the word's low byte
+  if (setting & 0x40)
+    return 0;                                             // DRAM
+  switch (setting & 0x3f)
+  {
+  case 0x02: return 1;
+  case 0x04: return 2;
+  case 0x08: return 3;
+  case 0x10: return 4;
+  default:   return 0;
+  }
+}
+
 UINT8 CModel2::Read8(UINT32 addr)
 {
+  ChargeWaits(addr);
   unsigned shift = (addr & 3) * 8;
   return uint8_t(ReadDword(addr & ~3u, 0xffu << shift) >> shift);
 }
 
 UINT16 CModel2::Read16(UINT32 addr)
 {
+  ChargeWaits(addr);
   unsigned shift = (addr & 2) * 8;
   return uint16_t(ReadDword(addr & ~3u, 0xffffu << shift) >> shift);
 }
 
 UINT32 CModel2::Read32(UINT32 addr)
 {
+  ChargeWaits(addr);
   return ReadDword(addr & ~3u, 0xffffffff);
 }
 
 void CModel2::Write8(UINT32 addr, UINT8 data)
 {
+  ChargeWaits(addr);
   unsigned shift = (addr & 3) * 8;
   WriteDword(addr & ~3u, uint32_t(data) << shift, 0xffu << shift);
 }
 
 void CModel2::Write16(UINT32 addr, UINT16 data)
 {
+  ChargeWaits(addr);
   unsigned shift = (addr & 2) * 8;
   WriteDword(addr & ~3u, uint32_t(data) << shift, 0xffffu << shift);
 }
 
 void CModel2::Write32(UINT32 addr, UINT32 data)
 {
+  ChargeWaits(addr);
   WriteDword(addr & ~3u, data, 0xffffffff);
 }
 
@@ -2527,6 +2576,9 @@ void CModel2::RunFrame(void)
     RunLine();
   }
 
+  if (m_wheelBoard)
+    m_wheelBoard->RunFrame();
+
   BuildVideoFrame();
   m_frameNumber++;
 
@@ -2656,6 +2708,8 @@ void CModel2::Reset(void)
   m_ioBoardBootFrames = IO_BOARD_BOOT_FRAMES;
   m_gearSel = 0;
   m_comm.Reset();
+  if (m_wheelBoard)
+    m_wheelBoard->Reset();
   IRQUpdate();
 
   DebugLog("Model 2 reset\n");
@@ -2777,6 +2831,8 @@ void CModel2::SaveState(CBlockFile *SaveState)
     SaveState->Write(m_driveBoard.initCommands);
     SaveState->Write(m_driveBoard.readMode);
   }
+  if (m_wheelBoard)
+    m_wheelBoard->SaveState(SaveState);
 }
 
 void CModel2::LoadState(CBlockFile *SaveState)
@@ -2914,6 +2970,9 @@ void CModel2::LoadState(CBlockFile *SaveState)
     SaveState->Read(m_driveBoard.initCommands);
     SaveState->Read(m_driveBoard.readMode);
   }
+  // (a state made without the board leaves it running as it is)
+  if (m_wheelBoard && Result::OKAY == SaveState->FindBlock("DriveBoard.2"))
+    m_wheelBoard->LoadState(SaveState);
 
   for (unsigned i = 0; i < m_paletteRAM.size(); i++)
     UpdatePaletteEntry(i);
@@ -3064,6 +3123,33 @@ Result CModel2::Init(const Game &game, const ROMSet &rom_set)
   m_driveBoard.present = game.driveboard_type == Game::DRIVE_BOARD_SKI || game.driveboard_type == Game::DRIVE_BOARD_MOTION;
   m_driveBoard.ski = game.driveboard_type == Game::DRIVE_BOARD_SKI;
   m_rchase2Drive = game.name == "rchase2" || game.parent == "rchase2";
+  // The wheel drive board, if its ROM is there (optional, as Model 3's) and
+  // force feedback is on (without, the game runs as with no board)
+  m_wheelBoard.reset();
+  m_wheelBoardReplies = false;
+  if (game.driveboard_type == Game::DRIVE_BOARD_WHEEL && m_config["ForceFeedback"].ValueAsDefault<bool>(false))
+  {
+    ROM rom = rom_set.get_rom("driveboard_program");
+    if (rom.size)
+    {
+      m_wheelBoardROM.assign(0x10000, 0xFF);
+      rom.CopyTo(m_wheelBoardROM.data(), m_wheelBoardROM.size());
+      // 2B/2C (Indy 500, Touring Car, Over Rev, Super GT 24h): EPR-18261
+      m_wheelBoardReplies = m_model2b || m_model2c;
+      if (m_wheelBoardReplies)
+        m_wheelBoard = std::make_unique<CModel2DirectDriveBoard>(m_config);
+      else
+        m_wheelBoard = std::make_unique<CModel2DriveBoard>(m_config);
+      if (m_wheelBoard->Init(m_wheelBoardROM.data()) != Result::OKAY)
+        m_wheelBoard.reset();
+      else
+      {
+        m_wheelBoard->AttachInputs(m_inputs, game.inputs);
+        if (m_outputs)
+          m_wheelBoard->AttachOutputs(m_outputs);
+      }
+    }
+  }
 
   if (!LoadROMs(rom_set))
     return Result::FAIL;
