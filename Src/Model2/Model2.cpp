@@ -850,6 +850,31 @@ void CModel2::TimerWrite(unsigned n, uint32_t data, uint32_t mask)
   m_timerOrig[n] = m_timerVal[n];
   m_timerStart[n] = I960Now();
   m_timerRun[n] = true;
+
+  // A count of 0 runs out at the write, not after this slice. Over Rev stops
+  // a timer in its interrupt handler by writing 0 with that timer's interrupt
+  // disabled, then enables it again: run out later, the timer interrupted
+  // again and again, and each time the handler sent the same byte of its
+  // sound command (timer 1 sends the second byte, timer 2 the third). The
+  // repeated command started a looping sound over and over until all 32 of
+  // the sound driver's voices were taken, and its voice allocation then
+  // returned through a bad stack frame and crashed the sound 68000 (the
+  // sound stuck in a loop at the start of the second race).
+  if (m_timerOrig[n] == 0)
+    TimerExpire(n);
+}
+
+// A timer reaches 0: IRQ 2 if enabled now, and it stops
+void CModel2::TimerExpire(unsigned n)
+{
+  const uint32_t line = 1 << (n + 2);
+  if (m_intEna & line)
+  {
+    m_intReq |= line;
+    IRQUpdate();
+  }
+  m_timerVal[n] = 0xfffff;
+  m_timerRun[n] = false;
 }
 
 void CModel2::RunTimers()
@@ -858,14 +883,7 @@ void CModel2::RunTimers()
   {
     if (!m_timerRun[n] || m_time[CPU_I960] - m_timerStart[n] < int64_t(m_timerOrig[n]) * I960_TIME)
       continue;
-    const uint32_t line = 1 << (n + 2);
-    if (m_intEna & line)
-    {
-      m_intReq |= line;
-      IRQUpdate();
-    }
-    m_timerVal[n] = 0xfffff;
-    m_timerRun[n] = false;
+    TimerExpire(n);
   }
 }
 
@@ -1528,6 +1546,9 @@ void CModel2::WriteDword(uint32_t addr, uint32_t data, uint32_t mask)
   {
     uint32_t &d = m_textureRAM[(addr >> 21) & 1][(addr & (m_model2c ? 0x1fffff : 0xfffff)) >> 2];
     d = Combine32(d, data, mask);
+    // Mark this sheet changed (bit 21 picks it: 0x11000000 = sheet 0,
+    // 0x11200000 = sheet 1) so the renderer uploads it again
+    m_textureDirty[(addr >> 21) & 1] = true;
     return;
   }
   if ((m_model2b || m_model2c) && addr >= 0x11400000 && addr < 0x11410000)
@@ -1549,6 +1570,9 @@ void CModel2::WriteDword(uint32_t addr, uint32_t data, uint32_t mask)
       d = (d & 0x0000ffff) | ((data & 0xffff) << 16);
     else
       d = (d & 0xffff0000) | (data & 0xffff);
+    // Mark this sheet changed (bit 22 picks it: 0x12000000 = sheet 0,
+    // 0x12400000 = sheet 1) so the renderer uploads it again
+    m_textureDirty[(addr >> 22) & 1] = true;
     return;
   }
   if (!m_model2b && !m_model2c && addr >= 0x12800000 && addr < 0x12820000)
@@ -2926,6 +2950,8 @@ void CModel2::LoadState(CBlockFile *SaveState)
   ReadVector(SaveState, m_colorXlat);
   ReadVector(SaveState, m_textureRAM[0]);
   ReadVector(SaveState, m_textureRAM[1]);
+  m_textureDirty[0] = true;
+  m_textureDirty[1] = true;
   ReadVector(SaveState, m_lumaRAM);
   ReadVector(SaveState, m_fbVRAM[0]);
   ReadVector(SaveState, m_fbVRAM[1]);
@@ -3244,6 +3270,8 @@ Result CModel2::Init(const Game &game, const ROMSet &rom_set)
   m_colorXlat.assign(0xC000 / 2, 0);
   m_textureRAM[0].assign(0x80000, 0);
   m_textureRAM[1].assign(0x80000, 0);
+  m_textureDirty[0] = true;
+  m_textureDirty[1] = true;
   m_lumaRAM.assign(0x8000, 0);
   m_fbVRAM[0].assign(0x80000 / 2, 0);
   m_fbVRAM[1].assign(0x80000 / 2, 0);
@@ -3301,6 +3329,7 @@ Result CModel2::Init(const Game &game, const ROMSet &rom_set)
   mem.lumaRAM = m_lumaRAM.data();
   mem.textureRAM0 = m_textureRAM[0].data();
   mem.textureRAM1 = m_textureRAM[1].data();
+  mem.textureDirty = m_textureDirty;
   mem.gamma = m_gamma;
   mem.polygonROM = m_polyROM.data();
   mem.polygonROMWords = (uint32_t) m_polyROM.size();

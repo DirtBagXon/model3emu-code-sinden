@@ -1,7 +1,7 @@
 # Supermodel: Sega Model Series Emulator (Sinden)
 *Copyright 2003-2026 The Supermodel Team*
 
-This is a fork of [model3emu-code](https://www.supermodel3.com) to add native **Sinden** light gun support.
+This is a fork of [Supermodel](https://github.com/trzy/Supermodel) to add native **Sinden** light gun support.
 
 This fork uses [ManyMouse](https://github.com/icculus/manymouse) to provide 2 player gun support in Linux and MacOSX.
 
