@@ -71,6 +71,7 @@
 #include "Model2/Model2Comm.h"
 #include "Model2/Sega315_5838.h"
 #include "Model2/Model2DriveBoard.h"
+#include "Model3/BillBoard.h"
 #include "Model3/Crypto.h"
 #include "Model1/I8251.h"
 #include "Graphics/Model1Render.h"
@@ -232,6 +233,7 @@ private:
   void UpdateInputs(void);
   void UpdateIOBoard(const uint8_t (&an)[8], uint8_t in0, uint8_t in1, uint8_t in2);
   void BuildVideoFrame(void);
+  void DrawFrameBuffer(uint32_t *dest);
   bool LoadROMs(const ROMSet &rom_set);
 
   Util::Config::Node &m_config;
@@ -367,6 +369,9 @@ private:
   std::unique_ptr<CDriveBoard> m_wheelBoard;
   std::vector<uint8_t> m_wheelBoardROM;
   bool      m_wheelBoardReplies = false;
+  // Versus City billboard (Last Bronx): commands on port E, as Model 3's
+  std::unique_ptr<CBillBoard> m_billBoard;
+  std::vector<uint8_t> m_billBoardROM;
   bool      m_rchase2Drive = false;                      // Rail Chase 2's drive board on port D/E (MAME's simulation)
 
   // Drive board (Sega Ski Super G's ski board, Manx TT DX's motion slider),
