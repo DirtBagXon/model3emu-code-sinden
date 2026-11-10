@@ -67,14 +67,15 @@ jobs:
         if: startsWith(matrix.os, 'windows')
         uses: msys2/setup-msys2@v2
         with:
+          msystem: UCRT64
           update: true
           install: >-
             make
             zip
             git
-            mingw64/mingw-w64-x86_64-gcc
-            mingw64/mingw-w64-x86_64-SDL2
-            mingw64/mingw-w64-x86_64-SDL2_net
+            ucrt64/mingw-w64-ucrt-x86_64-gcc
+            ucrt64/mingw-w64-ucrt-x86_64-SDL2
+            ucrt64/mingw-w64-ucrt-x86_64-SDL2_net
       - name: Build
         run: make -f Makefiles/${{ matrix.makefile }} release
       - name: Validate
