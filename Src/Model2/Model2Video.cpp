@@ -891,6 +891,14 @@ void CVideo::model2_3d_push(raster_state *raster, u32 input)
 				// calculate clipping planes
 				ComputeClipPlanes();
 
+				// Supermodel: each window starts a new layer, depth sorted on its
+				// own. Counted here, as the rasterizer takes the command, so the
+				// 2B geometrizer program's windows count too (MAME counts them in
+				// its simulated geometrizer: with the program, every polygon was
+				// in one layer and Sonic Championship's shadows sorted into the
+				// fighters)
+				raster->cur_window++;
+
 				/* done with this command */
 				raster->cur_command = 0;
 			}
@@ -1812,8 +1820,6 @@ CVideo::WPtr CVideo::geo_window_data(geo_state &geo, u32 opcode, WPtr input)
 	/* start by pushing the opcode */
 	model2_3d_push(raster, opcode >> 23);
 
-	raster->cur_window++;
-
 	/*
 	    we're going to move 6 coordinates to the 3d rasterizer:
 	    - starting coordinate
@@ -1898,10 +1904,14 @@ CVideo::WPtr CVideo::geo_polygon_data(geo_state &geo, u32 opcode, WPtr input)
 /* Command 06: Texture Parameters */
 CVideo::WPtr CVideo::geo_texture_parameters(geo_state &geo, u32 opcode, WPtr input)
 {
-	u32  index;
-
 	/* read in the index */
-	index = (*input++) & 0x1f;   // Supermodel: the entry number (MAME: >> 2, Gunblade's explosion flash went to the wrong entry)
+	// Each entry holds 4 values (diffuse, ambient, specular control, specular
+	// scale). Model 2/2A games send the position of the entry's first value,
+	// so divide by 4 to get the entry number (VF2). 2B/2C games send the entry
+	// number itself (Gunblade NY).
+	bool const entry = m_stepping == Game::Stepping::MODEL2B || m_stepping == Game::Stepping::MODEL2C;
+	u32 index = entry ? (*input & 0x1f) : ((*input >> 2) & 0x1f);
+	input++;
 
 	/* read in the conut */
 	u32 const count = ListCount(*input++);
