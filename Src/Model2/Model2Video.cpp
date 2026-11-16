@@ -347,22 +347,26 @@ inline u16 CVideo::float_to_zval(float floatval, s32 z_adjust)
 	}
 	mantissa >>= 11;
 
-	// Supermodel: negative sorts as the farthest (MAME: the nearest, 0). Only
-	// a polygon entirely behind the camera (culled), or one taking such a
-	// polygon's z ("old value"), still has one: a min z sort uses the max z
-	// when the min z is negative (see model2_3d_process_polygon)
-	if (fpint < 0)
-		return 0xffff;
-
 	// the rest depends on the exponent
+	s32 value;
 	if (exponent < -12)
-		return 0x0000; // less than -12 is too small, return 0
+		value = 0x0000; // less than -12 is too small, return 0
 	else if (exponent < 0)
-		return (mantissa | 0x1000) >> -exponent; // between -12 and 0 create a denormal with exponent of 0
+		value = (mantissa | 0x1000) >> -exponent; // between -12 and 0 create a denormal with exponent of 0
 	else if (exponent < 15)
-		return ((exponent + 1) << 12) | mantissa; // between 0 and 14 create a FP value with exponent + 1
+		value = ((exponent + 1) << 12) | mantissa; // between 0 and 14 create a FP value with exponent + 1
 	else
-		return 0xffff; // above 14 is too large
+		value = 0xffff; // above 14 is too large
+
+	// Supermodel: the z-sort mode's offset (bits 22-8 of its word; MAME ignores
+	// it) is added to the signed value, and the result clamped to 0-FFFF: a
+	// negative z (a polygon with some of it behind the camera, sorted by its
+	// min z) sorts nearest unless the offset keeps it above 0. Last Bronx and
+	// Virtual On set an offset, the other games tested none.
+	if (fpint < 0)
+		value = -value;
+	value += (z_adjust >> 8) & 0x7fff;
+	return u16(std::clamp(value, 0, 0xffff));
 }
 
 // Supermodel: at most max_out vertices are written. A convex quad clipped by
@@ -552,14 +556,9 @@ void CVideo::model2_3d_process_polygon(raster_state *raster, u32 attr)
 			zvalue = raster->polygon_z;
 			break;
 		case 1: // min z
-			// Supermodel: a polygon crossing the eye's plane (some of it behind
-			// the camera) has a negative min z; it sorts by its max z, the far
-			// end of the part in front of the camera. MAME sorts it nearest (0),
-			// drawing it over everything (Indy 500's backdrop hides the track,
-			// Virtual On's floor the robot's feet); sorted farthest it went
-			// behind the scenery (Indy 500's walls and fence near the camera
-			// vanish: on the hardware they are drawn).
-			zvalue = (min_z < 0) ? max_z : min_z;
+			// (of its corners, before clipping: a negative one sorts nearest,
+			// see float_to_zval)
+			zvalue = min_z;
 			break;
 		case 2: // max z
 			zvalue = max_z;
