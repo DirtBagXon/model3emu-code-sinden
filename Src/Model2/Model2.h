@@ -225,6 +225,7 @@ private:
   uint8_t IORead(unsigned offset);
   uint8_t RailChase2DriveRead() const;
   void IOWrite(unsigned offset, uint8_t data);
+  void LampOutputWrite(uint8_t data);
   void EEPROMWrite(uint8_t data);
   uint8_t In0Read();
 
@@ -242,6 +243,9 @@ private:
   CInputs   *m_inputs;
   COutputs  *m_outputs;
   Game      m_game;
+  // Port F bits that are this game's view lamps 1-4 and leader lamp (0: none)
+  uint8_t   m_lampView[4] = {};
+  uint8_t   m_lampLeader = 0;
 
   CI960                 m_i960;
   CMB86233              m_tgp;

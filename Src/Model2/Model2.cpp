@@ -1063,6 +1063,25 @@ uint8_t CModel2::IORead(unsigned offset)
   }
 }
 
+// The I/O board's port F: coin counters (bits 0-1) and lamps (bits 2-7, MAME's
+// lamp_output_w), all as RawLamps. Bit 2 is the start lamp; the view and leader
+// lamps, where the game has them, are named as Model 3's (m_lampView/Leader).
+void CModel2::LampOutputWrite(uint8_t data)
+{
+  if (!m_outputs)
+    return;
+  static const EOutputs viewOutputs[4] = { OutputLampView1, OutputLampView2, OutputLampView3, OutputLampView4 };
+  m_outputs->SetValue(OutputLampStart, !!(data & 0x04));
+  for (int i = 0; i < 4; i++)
+  {
+    if (m_lampView[i])
+      m_outputs->SetValue(viewOutputs[i], !!(data & m_lampView[i]));
+  }
+  if (m_lampLeader)
+    m_outputs->SetValue(OutputLampLeader, !!(data & m_lampLeader));
+  m_outputs->SetValue(OutputRawLamps, data);
+}
+
 void CModel2::IOWrite(unsigned offset, uint8_t data)
 {
   switch (offset)
@@ -1077,20 +1096,10 @@ void CModel2::IOWrite(unsigned offset, uint8_t data)
       m_wheelBoard->Write(data);    // port E: wheel drive board command
     else if (offset == 4 && m_billBoard)
       m_billBoard->Write(data);     // port E: billboard command
-    // Port F: lamps (bits 2-7) and coin counters (MAME's lamp_output_w), as
-    // Model 3's outputs
     if (m_outputs && offset == 4)
       m_outputs->SetValue(OutputRawDrive, data);
-    else if (m_outputs && offset == 5)
-    {
-      m_outputs->SetValue(OutputLampStart, !!(data & 0x04));
-      m_outputs->SetValue(OutputLampView1, !!(data & 0x08));
-      m_outputs->SetValue(OutputLampView2, !!(data & 0x10));
-      m_outputs->SetValue(OutputLampView3, !!(data & 0x20));
-      m_outputs->SetValue(OutputLampView4, !!(data & 0x40));
-      m_outputs->SetValue(OutputLampLeader, !!(data & 0x80));
-      m_outputs->SetValue(OutputRawLamps, data);
-    }
+    else if (offset == 5)
+      LampOutputWrite(data);        // port F: lamps
     break;
   case 0x08:
     m_io.portConfig = data;
@@ -2518,9 +2527,12 @@ void CModel2::UpdateIOBoard(const uint8_t (&an)[8], uint8_t in0, uint8_t in1, ui
   m_dpram[10] = (uint8_t) ~in2;
   // the board's DIP switches (MAME: three banks, all off)
   m_dpram[0x0B] = m_dpram[0x0C] = m_dpram[0x0D] = 0xFF;
-  // a fourth input port (Desert Tank reads it at boot; 0 there keeps it in
-  // test mode): nothing pressed
-  m_dpram[0x0E] = m_dpram[0x0F] = 0xFF;
+  // a fourth input port, the board's port G (Desert Tank reads it at boot; 0
+  // there keeps it in test mode): nothing pressed
+  m_dpram[0x0E] = 0xFF;
+  // Byte 0F is the other way: the game's lamps, which the board's firmware
+  // (epr-14869c at 016E) copies to its port F
+  LampOutputWrite(m_dpram[0x0F]);
   // Light guns (Virtua Cop's model1io2 board; MAME's fpga_r 0-8, which its
   // BIOS copies to 80-88): P1 Y, P1 X, P2 Y, P2 X (16 bits, little endian),
   // then the off-screen bits (0: P1, 1: P2)
@@ -3341,6 +3353,34 @@ Result CModel2::Init(const Game &game, const ROMSet &rom_set)
   m_model2c = game.stepping == Game::Stepping::MODEL2C;
   m_video3d.SetStepping(game.stepping);
   m_layout = LayoutOf(game.name, game.parent);
+
+  // Port F's lamps (MAME's per-game OUTPUTS notes): bit 2 is the start lamp
+  // in all of them, the view and leader lamps differ
+  {
+    const std::string &root = game.parent.empty() ? game.name : game.parent;
+    auto views = [this](uint8_t v1, uint8_t v2, uint8_t v3, uint8_t v4) { m_lampView[0] = v1; m_lampView[1] = v2; m_lampView[2] = v3; m_lampView[3] = v4; };
+    views(0, 0, 0, 0);
+    m_lampLeader = 0;
+    if (root == "daytona")          // VR1-4, leader
+    {
+      views(0x08, 0x10, 0x20, 0x40);
+      m_lampLeader = 0x80;
+    }
+    else if (root == "desert")      // VR1-3 (bits 6-7: the gun motors)
+      views(0x08, 0x10, 0x20, 0);
+    else if (root == "srallyc")     // VR, leader
+    {
+      views(0x20, 0, 0, 0);
+      m_lampLeader = 0x80;
+    }
+    else if (root == "indy500")     // view 1-2, leader
+    {
+      views(0x10, 0x20, 0, 0);
+      m_lampLeader = 0x80;
+    }
+    else if (root == "stcc" || root == "overrev" || root == "sgt24h")  // view 1-2 (STCC: zoom in, out; bit 3 max revs)
+      views(0x10, 0x20, 0, 0);
+  }
   m_driveBoard.present = game.driveboard_type == Game::DRIVE_BOARD_SKI || game.driveboard_type == Game::DRIVE_BOARD_MOTION;
   m_driveBoard.ski = game.driveboard_type == Game::DRIVE_BOARD_SKI;
   m_rchase2Drive = game.name == "rchase2" || game.parent == "rchase2";
