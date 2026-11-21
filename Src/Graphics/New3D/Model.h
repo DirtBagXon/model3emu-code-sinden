@@ -109,39 +109,8 @@ struct FVertex				// full vertex including face attributes
 	}
 };
 
-enum class Layer { colour, trans1, trans2, trans12 /*both 1&2*/, all, none };
-
 struct Mesh
 {
-	//helper funcs
-	bool Render(Layer layer, float nodeAlpha)
-	{
-		bool nAlpha = nodeAlpha < 1.0f;
-
-		switch (layer)
-		{
-		case Layer::colour:
-			if (polyAlpha || nAlpha) {
-				return false;
-			}
-			break;
-		case Layer::trans1:
-			if ((!textureAlpha && !polyAlpha && !nAlpha) || transLSelect) {
-				return false;
-			}
-			break;
-		case Layer::trans2:
-			if ((!textureAlpha && !polyAlpha && !nAlpha) || !transLSelect) {
-				return false;
-			}
-			break;
-		default:					// not using these types
-			return false;
-		}
-
-		return true;
-	}
-
 	enum TexWrapMode : int { repeat = 0, repeatClamp, mirror, mirrorClamp };
 
 	// texture
@@ -166,6 +135,7 @@ struct Mesh
 	bool polyAlpha		= false;		// specified in the rgba colour
 	bool textureAlpha	= false;		// use alpha in texture
 	bool alphaTest		= false;		// discard fragment based on alpha (ogl does this with fixed function)
+	bool transEdge		= false;		// edge on translucency: a contour texture's edge is translucent, not cut
 	bool layered		= false;		// stencil poly
 	bool highPriority	= false;		// rendered over the top
 	bool transLSelect	= false;		// actually the transparency layer, false = layer 0, true = layer 1
